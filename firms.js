@@ -1,4 +1,6 @@
-import { kv } from '@vercel/kv';
+import { Redis } from '@upstash/redis';
+
+const redis = Redis.fromEnv();
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -10,8 +12,9 @@ export default async function handler(req, res) {
   const key = 'firms:registry';
 
   if (req.method === 'GET') {
-    const firms = await kv.get(key);
-    return res.status(200).json({ firms: firms || [] });
+    const raw = await redis.get(key);
+    const firms = typeof raw === 'string' ? JSON.parse(raw) : (raw || []);
+    return res.status(200).json({ firms });
   }
 
   if (req.method === 'POST') {
@@ -20,10 +23,11 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Ungültig' });
     }
     const name = firm.trim();
-    let firms = await kv.get(key) || [];
+    const raw = await redis.get(key);
+    let firms = typeof raw === 'string' ? JSON.parse(raw) : (raw || []);
     firms = firms.filter(f => f.toLowerCase() !== name.toLowerCase());
     firms.unshift(name);
-    await kv.set(key, firms.slice(0, 20));
+    await redis.set(key, JSON.stringify(firms.slice(0, 20)));
     return res.status(200).json({ ok: true });
   }
 

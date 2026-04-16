@@ -1,4 +1,6 @@
-import { kv } from '@vercel/kv';
+import { Redis } from '@upstash/redis';
+
+const redis = Redis.fromEnv();
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -15,8 +17,9 @@ export default async function handler(req, res) {
   const key = `portfolio:${firm.trim().toLowerCase()}`;
 
   if (req.method === 'GET') {
-    const data = await kv.get(key);
-    return res.status(200).json({ portfolio: data || [] });
+    const raw = await redis.get(key);
+    const data = typeof raw === 'string' ? JSON.parse(raw) : (raw || []);
+    return res.status(200).json({ portfolio: data });
   }
 
   if (req.method === 'POST') {
@@ -24,12 +27,12 @@ export default async function handler(req, res) {
     if (!Array.isArray(portfolio)) {
       return res.status(400).json({ error: 'Ungültige Daten' });
     }
-    await kv.set(key, portfolio);
+    await redis.set(key, JSON.stringify(portfolio));
     return res.status(200).json({ ok: true });
   }
 
   if (req.method === 'DELETE') {
-    await kv.del(key);
+    await redis.del(key);
     return res.status(200).json({ ok: true });
   }
 

@@ -3,6 +3,6 @@
   "version": "1.0.0",
   "description": "Strategische Bewertung von Vendor-Abhängigkeiten",
   "dependencies": {
-    "@vercel/kv": "^2.0.0"
+    "@upstash/redis": "^1.34.0"
   }
 }
