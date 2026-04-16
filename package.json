@@ -1,7 +1,6 @@
 {
   "name": "vendor-lockin-tool",
   "version": "1.0.0",
-  "description": "Strategische Bewertung von Vendor-Abhängigkeiten",
   "dependencies": {
     "@upstash/redis": "^1.34.0"
   }
