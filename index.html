@@ -800,6 +800,109 @@ body {
   .app-name-input { min-width: auto; }
   .save-btn { margin-left: 0; }
 }
+
+/* ─── APP MODAL ─── */
+.modal-backdrop {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.32);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.modal-backdrop.open { display: flex; animation: fadeIn .18s ease; }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+.modal-box {
+  background: var(--surface);
+  border-radius: 20px;
+  box-shadow: 0 8px 48px rgba(0,0,0,0.18);
+  width: 100%;
+  max-width: 680px;
+  max-height: 88vh;
+  overflow-y: auto;
+  animation: slideUp .22s cubic-bezier(.4,0,.2,1);
+}
+@keyframes slideUp { from{transform:translateY(16px);opacity:0} to{transform:translateY(0);opacity:1} }
+.modal-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  padding: 24px 24px 0; gap: 16px;
+}
+.modal-app-name { font-family: "DM Serif Display", serif; font-size: 22px; letter-spacing: -0.02em; }
+.modal-app-meta { font-size: 12px; color: var(--text3); margin-top: 3px; }
+.modal-close {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 1px solid var(--border2); background: none;
+  font-size: 16px; color: var(--text2); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all .15s; font-family: inherit; line-height:1;
+}
+.modal-close:hover { background: var(--surface2); color: var(--text); }
+.modal-score-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 24px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.modal-score-num { font-family: "DM Serif Display", serif; font-size: 44px; line-height:1; letter-spacing:-0.03em; }
+.modal-risk-pill { font-size: 12px; font-weight: 500; padding: 4px 12px; border-radius: 99px; border: 1px solid; }
+.modal-tabs {
+  display: flex; padding: 0 24px;
+  border-bottom: 1px solid var(--border);
+}
+.modal-tab {
+  padding: 13px 18px; font-size: 13px; font-weight: 400;
+  color: var(--text2); cursor: pointer; border: none;
+  background: none; font-family: "DM Sans", sans-serif;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: all .15s;
+}
+.modal-tab.active { color: var(--text); font-weight: 500; border-bottom-color: var(--text); }
+.modal-tab:hover { color: var(--text); }
+.modal-body { padding: 24px; }
+.modal-tab-panel { display: none; }
+.modal-tab-panel.active { display: block; }
+.action-section { margin-bottom: 24px; }
+.action-section-title {
+  font-size: 11px; font-weight: 500; color: var(--text3);
+  text-transform: uppercase; letter-spacing: .07em;
+  margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+}
+.action-section-title::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+.action-item {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 12px 14px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--surface);
+  margin-bottom: 8px; transition: all .15s;
+}
+.action-item:hover { border-color: var(--border2); background: var(--surface2); }
+.action-prio {
+  width: 22px; height: 22px; border-radius: 50%;
+  font-size: 11px; font-weight: 500;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px;
+}
+.action-prio.p1 { background: #f5e8e8; color: #6e1a1a; }
+.action-prio.p2 { background: #f5ede8; color: #8a3520; }
+.action-prio.p3 { background: #f5eed8; color: #7a5520; }
+.action-prio.p4 { background: #e8f2ec; color: #2d6e4e; }
+.action-text { flex: 1; }
+.action-title { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.4; }
+.action-desc { font-size: 12px; color: var(--text2); margin-top: 3px; line-height: 1.5; }
+.action-dim-tag {
+  font-size: 10px; padding: 2px 7px; border-radius: 99px;
+  border: 1px solid var(--border2); color: var(--text3);
+  white-space: nowrap; flex-shrink: 0; margin-top: 2px;
+}
+.modal-edit-btn {
+  width: 100%; padding: 13px;
+  background: var(--text); color: #fff;
+  border: none; border-radius: var(--radius-sm);
+  font-size: 14px; font-weight: 500;
+  font-family: "DM Sans", sans-serif;
+  cursor: pointer; transition: opacity .2s; margin-top: 4px;
+}
+.modal-edit-btn:hover { opacity: .85; }
+.modal-dim-bars { margin-bottom: 20px; }
 </style>
 </head>
 <body>
@@ -955,6 +1058,23 @@ const DIMS_DEF = [
         hint:'Z. B. Docker/Kubernetes auf beliebiger Infrastruktur versus nur als Managed Service des Anbieters nutzbar.',
         opts:['Vollständig containerisiert und plattformunabhängig deploybar','Grösstenteils — kleinere anbieterabhängige Teile vorhanden','Teilweise — Kernanwendung portabel, Peripherie nicht','Kaum — Deployment ist stark an Anbieterdienste geknüpft','Nicht möglich — Betrieb ausschliesslich über Anbieterplattform']
       }
+    ],
+    qsSupport:[
+      {
+        q:'Könnte diese Applikation ohne grösseren technischen Aufwand durch ein alternatives Tool ersetzt werden?',
+        hint:'Denke an SaaS-Alternativen am Markt — gibt es vergleichbare Lösungen, die ähnliche Funktionen bieten?',
+        opts:['Ja — viele gleichwertige Alternativen verfügbar','Weitgehend — mit geringem Aufwand ersetzbar','Teilweise — einige Anpassungen nötig','Eher nicht — kaum funktionsgleiche Alternativen','Nein — keine vergleichbare Lösung am Markt']
+      },
+      {
+        q:'Nutzt die Applikation überwiegend Standard-Schnittstellen und offene Formate, oder ist sie tief in proprietäre Anbieterstrukturen eingebunden?',
+        hint:'Standardlösungen mit offenen APIs sind einfacher auszutauschen als tief integrierte Speziallösungen.',
+        opts:['Ausschliesslich offene Standards und Formate','Überwiegend offen — einzelne proprietäre Elemente','Gemischt','Überwiegend proprietär','Vollständig proprietär eingebunden']
+      },
+      {
+        q:'Wie hoch ist der Einführungsaufwand für eine alternative Lösung — technisch und für die Benutzer?',
+        hint:'Bei Supportapplikationen ist der Change-Aufwand für Mitarbeitende oft die grösste Hürde.',
+        opts:['Minimal — schnell eingeführt und erlernt','Gering — wenige Tage Einarbeitung','Mittel — einige Wochen Umstellung','Hoch — intensive Einführungsphase nötig','Sehr hoch — tiefe Spezialisierung kaum transferierbar']
+      }
     ]
   },
   {
@@ -992,6 +1112,23 @@ const DIMS_DEF = [
         q:'Gibt es Einschränkungen oder Zusatzkosten, wenn du grosse Datenmengen exportieren oder zu einem anderen Anbieter übertragen möchtest?',
         hint:'Sogenannte Egress-Kosten oder API-Limits können einen Wechsel erheblich verteuern oder faktisch verhindern.',
         opts:['Keine — Datenabzug und Transfer sind kostenlos und unbegrenzt','Geringe Kosten — im Budget vernachlässigbar','Messbare Kosten — im Budget noch handhabbar','Hohe Kosten — würden einen Wechsel deutlich verteuern','Sehr hohe Kosten oder technische Sperren — faktische Wechselblockade']
+      }
+    ],
+    qsSupport:[
+      {
+        q:'Können die Daten aus dieser Applikation einfach exportiert werden, z. B. als CSV oder Excel?',
+        hint:'Bei Supporttools wie HR, Reisekosten oder Ticketing ist ein einfacher Datenexport entscheidend.',
+        opts:['Ja — vollständiger Self-Service-Export jederzeit möglich','Weitgehend — mit geringem Aufwand exportierbar','Teilweise — nicht alle Daten sind exportierbar','Schwierig — Export nur mit Anbieterunterstützung','Nicht möglich — kein Datenexport vorgesehen']
+      },
+      {
+        q:'Wie viele andere Systeme sind direkt mit dieser Applikation verbunden und müssten bei einem Wechsel angepasst werden?',
+        hint:'Auch Supporttools können über Schnittstellen zu HR-Systemen, Buchhaltung oder Verzeichnisdiensten verbunden sein.',
+        opts:['Keine Verbindungen — vollständig isolierte Lösung','Eine oder zwei, leicht anpassbar','Einige — überschaubarer Aufwand','Mehrere — nennenswerter Integrationsaufwand','Viele — ein Wechsel würde viele Systeme betreffen']
+      },
+      {
+        q:'Werden Daten in Standard-Formaten gespeichert, oder ist ein Anbieter-Tool für den Zugriff zwingend nötig?',
+        hint:'Offene Formate erlauben den Zugriff auf Daten unabhängig vom Anbieter.',
+        opts:['Ausschliesslich offene Standardformate','Überwiegend offen','Gemischt','Überwiegend proprietär','Ohne Anbieter-Tool nicht lesbar']
       }
     ]
   },
@@ -1031,6 +1168,23 @@ const DIMS_DEF = [
         hint:'Z. B. Pflichtbindung an Add-ons, Zertifizierungen oder Exklusivpartner des Anbieters.',
         opts:['Keine Verpflichtung — vollständige Wahlfreiheit bei Zusatzdiensten','Einzelne optionale Empfehlungen — keine echte Pflicht','Moderate Pflichten — einige Dienste müssen zwingend genutzt werden','Starke Pflichten — viele Leistungen sind herstellergebunden vorgeschrieben','Vollständige Exklusivbindung — keinerlei Spielraum für Alternativen']
       }
+    ],
+    qsSupport:[
+      {
+        q:'Wie flexibel kann diese Applikation gekündigt oder gewechselt werden — wie lang ist die Mindestlaufzeit?',
+        hint:'Supporttools sollten idealerweise kurze Laufzeiten haben, da sie weniger betriebskritisch sind.',
+        opts:['Monatlich kündbar — sehr flexibel','Jährlich — akzeptabel','Zwei Jahre — noch überschaubar','Drei Jahre oder mehr — eingeschränkte Flexibilität','Sehr langfristig — kaum Ausstiegsmöglichkeit']
+      },
+      {
+        q:'Ist die monatliche oder jährliche Gebühr für diese Applikation im Verhältnis zum Nutzen transparent und verhältnismässig?',
+        hint:'Für Supporttools ist ein klares Preis-Leistungs-Verhältnis wichtig, da Wechsel einfacher möglich sein sollten.',
+        opts:['Sehr transparent und verhältnismässig','Weitgehend nachvollziehbar','Teils unklar — Kosten schwer kalkulierbar','Eher intransparent — Zusatzkosten häufig','Sehr intransparent — Kosten kaum planbar']
+      },
+      {
+        q:'Sind Rabatte oder Vergünstigungen an die Nutzung anderer Produkte desselben Anbieters geknüpft, die einen Wechsel verteuern würden?',
+        hint:'Paketrabatte erhöhen die Wechselkosten, auch wenn das Tool selbst leicht ersetzbar wäre.',
+        opts:['Nein — keine Bündelung','Leichte Bündelung — geringe Auswirkung','Moderate Bündelung','Starke Bündelung — Wechsel deutlich teurer','Vollständige Pakete — Einzelwechsel wirtschaftlich nicht sinnvoll']
+      }
     ]
   },
   {
@@ -1063,6 +1217,23 @@ const DIMS_DEF = [
         q:'Hat das Unternehmen intern genug Ressourcen und Kompetenz, um einen Anbieterwechsel oder Re-Platforming eigenständig zu planen und durchzuführen?',
         hint:'Fehlendes internes Know-how ist eine oft unterschätzte, aber kritische Wechselbarriere.',
         opts:['Ja — wir haben die Kompetenz und Kapazität vollständig intern','Weitgehend — kleinere externe Unterstützung wäre nötig','Teilweise — erhebliche externe Hilfe wäre erforderlich','Kaum — ein Wechsel wäre nur mit grossen externen Ressourcen machbar','Nicht vorhanden — vollständige externe Abhängigkeit für jeden Wechsel']
+      }
+    ],
+    qsSupport:[
+      {
+        q:'Wie schnell könnten neue Mitarbeitende mit einem alternativen Tool produktiv werden?',
+        hint:'Bei Standardsoftware im Supportbereich ist die Einarbeitung meistens kürzer als bei Kernsystemen.',
+        opts:['Sehr schnell — innerhalb von Stunden oder einem Tag','Schnell — wenige Tage','Mittel — ein bis zwei Wochen','Eher langsam — mehrere Wochen nötig','Langsam — intensive Schulung unbedingt nötig']
+      },
+      {
+        q:'Wie stark ist der Betrieb dieser Applikation von spezifischem Anbieterwissen oder externen Spezialisten abhängig?',
+        hint:'Supporttools sollten möglichst ohne externe Unterstützung betrieben werden können.',
+        opts:['Nicht abhängig — vollständig intern betrieben','Kaum — gelegentliche Rückfragen','Teils abhängig — regelmässige externe Hilfe','Stark abhängig — kaum ohne Anbieter betreibbar','Vollständig — kein internes Betriebswissen vorhanden']
+      },
+      {
+        q:'Wäre die Benutzerakzeptanz bei einem Wechsel zu einer alternativen Lösung voraussichtlich hoch?',
+        hint:'Hohe Nutzerzufriedenheit mit dem aktuellen Tool kann einen Wechsel erschweren, auch wenn er technisch einfach wäre.',
+        opts:['Ja — Mitarbeitende würden Alternativen problemlos akzeptieren','Weitgehend — leichte Überzeugungsarbeit nötig','Teils — gemischte Erwartungen im Team','Eher nicht — starke Präferenz für das aktuelle Tool','Nein — erheblicher interner Widerstand zu erwarten']
       }
     ]
   },
@@ -1102,6 +1273,23 @@ const DIMS_DEF = [
         hint:'Wenn der Markt keine funktionsäquivalenten Alternativen hat, ist ein Wechsel zwangsläufig mit Qualitätsverlust verbunden.',
         opts:['Nein — vergleichbare und bewährte Alternativen am Markt vorhanden','Kaum — kleinere Funktionslücken, die tolerierbar wären','Teilweise — einige Features müssten neu entwickelt oder aufgegeben werden','Stark — wesentliche Funktionen wären bei Alternativen nicht verfügbar','Vollständig — keine Marktlösung bietet annähernd denselben Funktionsumfang']
       }
+    ],
+    qsSupport:[
+      {
+        q:'Gibt es am Markt mehrere vergleichbare Lösungen, die diese Applikation kurzfristig ersetzen könnten?',
+        hint:'Ein breites Marktangebot an Alternativen reduziert das Lock-in-Risiko bei Supporttools erheblich.',
+        opts:['Ja — viele gleichwertige Alternativen bekannt und evaluiert','Weitgehend — einige Alternativen vorhanden','Teils — Alternativen bekannt, aber noch nicht geprüft','Wenige — Marktangebot eingeschränkt','Kaum — keine bekannten funktionsgleichen Alternativen']
+      },
+      {
+        q:'Wie realistisch wäre ein Wechsel dieser Applikation innerhalb von drei bis sechs Monaten, falls nötig?',
+        hint:'Für Supporttools sollte ein Wechsel in einem überschaubaren Zeitrahmen machbar sein.',
+        opts:['Sehr realistisch — innerhalb von Wochen möglich','Gut machbar — drei Monate ausreichend','Möglich — sechs Monate realistisch','Eher schwierig — mehr als sechs Monate nötig','Nicht realistisch — Wechsel würde über ein Jahr dauern']
+      },
+      {
+        q:'Könnten bestehende Daten (z. B. Verlauf, Auswertungen, Konfigurationen) bei einem Wechsel vollständig mitgenommen werden?',
+        hint:'Bei Supporttools wie HR oder Ticketing sind historische Daten wichtig, aber oft nicht betriebsblockierend.',
+        opts:['Ja — vollständiger Datenmitnahme möglich','Weitgehend — die meisten Daten sind exportierbar','Teilweise — wichtige Historien fehlen','Schwierig — erheblicher Datenverlust zu erwarten','Nicht möglich — Datenverlust unvermeidlich']
+      }
     ]
   },
   {
@@ -1134,6 +1322,23 @@ const DIMS_DEF = [
         q:'Wie gut könnte das Unternehmen einen temporären Teilausfall dieser Applikation während einer Migration organisatorisch verkraften?',
         hint:'Robuste Notfallprozesse und manuelle Alternativen reduzieren das Risiko; fehlende Alternativen erhöhen ihn erheblich.',
         opts:['Problemlos — robuste Notfallprozesse und manuelle Alternativen vorhanden','Gut beherrschbar — kurze Unterbrechungen gut tolerierbar','Mittel — erhebliche Belastung, aber mit Aufwand handhabbar','Schwierig — starke Beeinträchtigung des täglichen Geschäfts','Kaum möglich — keinerlei Notfallprozess, sofortige und schwere Betriebsunterbrechung']
+      }
+    ],
+    qsSupport:[
+      {
+        q:'Wie stark würde ein mehrtägiger Ausfall dieser Applikation den täglichen Betrieb beeinträchtigen?',
+        hint:'Bei Supporttools sind kurze Ausfälle meistens überbrückbar — manuelle Alternativen sind häufig vorhanden.',
+        opts:['Kaum — manuelle Alternativen problemlos verfügbar','Gering — kurze Unterbrechung ohne grosse Folgen','Spürbar — Produktivität reduziert, aber handhabbar','Deutlich — erhebliche Beeinträchtigung des Arbeitsalltags','Stark — Betrieb stark eingeschränkt ohne diese Applikation']
+      },
+      {
+        q:'Gibt es vertretbare Notfalllösungen oder manuelle Prozesse, die diese Applikation kurzfristig ersetzen könnten?',
+        hint:'Excel, E-Mail oder Papier können bei vielen Supporttools kurzfristig als Notfalllösung dienen.',
+        opts:['Ja — sofort verfügbare und funktionsfähige Notfalllösung','Weitgehend — mit etwas Aufwand umsetzbar','Teils — eingeschränkte manuelle Alternativen','Kaum — sehr schwierig ohne das System','Nein — keinerlei Notfalllösung vorstellbar']
+      },
+      {
+        q:'Wie hoch wäre der Gesamtaufwand (Zeit, Kosten, Personal) für einen vollständigen Wechsel dieser Applikation, realistisch geschätzt?',
+        hint:'Bei Supporttools sollte der Wechselaufwand im Verhältnis zum Nutzen stehen.',
+        opts:['Sehr gering — wenige Tage und minimale Kosten','Gering — ein bis zwei Wochen, überschaubare Kosten','Mittel — ein Monat, messbarer Aufwand','Hoch — mehrere Monate, erheblicher Aufwand','Sehr hoch — über sechs Monate, grosse Ressourcen nötig']
       }
     ]
   }
@@ -1273,10 +1478,14 @@ function getRisk(score) {
   return RISK[3];
 }
 
+function getQs(dim) {
+  return (appType === 'support' && dim.qsSupport) ? dim.qsSupport : dim.qs;
+}
+
 function dimScore(id) {
   const d = DIMS_DEF.find(x => x.id === id);
   let sum = 0, cnt = 0;
-  d.qs.forEach((_, i) => {
+  getQs(d).forEach((_, i) => {
     const v = answers[id + '_' + i];
     if (v) { sum += v; cnt++; }
   });
@@ -1335,9 +1544,9 @@ function renderDims() {
     const w = appType === 'kern' ? d.wKern : d.wSupport;
     const card = document.createElement('div');
     card.className = 'dim-card';
-    const qsHtml = d.qs.map((q, i) => `
+    const qsHtml = getQs(d).map((q, i) => `
       <div class="q-item" id="qitem-${d.id}-${i}">
-        <div class="q-number">Frage ${i + 1} von ${d.qs.length}</div>
+        <div class="q-number">Frage ${i + 1} von ${getQs(d).length}</div>
         <div class="q-text">${q.q}</div>
         <div class="q-hint">${q.hint}</div>
         <div class="q-options">
@@ -1354,12 +1563,12 @@ function renderDims() {
           <div class="dim-dot" style="background:${d.color}"></div>
           <div class="dim-info">
             <div class="dim-name">${d.label}</div>
-            <div class="dim-meta">Gewicht: <span id="dim-weight-${d.id}">${(w*100).toFixed(0)}%</span> · ${d.qs.length} Fragen · ${d.hint}</div>
+            <div class="dim-meta">Gewicht: <span id="dim-weight-${d.id}">${(w*100).toFixed(0)}%</span> · ${getQs(d).length} Fragen · ${d.hint}</div>
           </div>
         </div>
         <div class="dim-right">
           <span class="dim-score-badge" id="dscore-${d.id}"></span>
-          <span class="dim-progress" id="dprog-${d.id}">0 / ${d.qs.length}</span>
+          <span class="dim-progress" id="dprog-${d.id}">0 / ${getQs(d).length}</span>
           <span class="chevron" id="chev-${d.id}">▼</span>
         </div>
       </div>
@@ -1399,7 +1608,7 @@ function updateDimHeader(id) {
   const answered = d.qs.filter((_, i) => answers[id + '_' + i]).length;
   const badge = document.getElementById('dscore-' + id);
   const prog = document.getElementById('dprog-' + id);
-  if (prog) prog.textContent = answered + ' / ' + d.qs.length;
+  if (prog) prog.textContent = answered + ' / ' + getQs(d).length;
   if (badge) {
     if (s > 0) {
       badge.style.display = 'inline-block';
@@ -1415,7 +1624,7 @@ function updateDimHeader(id) {
 }
 
 function updateProgress() {
-  const total = DIMS_DEF.reduce((a, d) => a + d.qs.length, 0);
+  const total = DIMS_DEF.reduce((a, d) => a + getQs(d).length, 0);
   const done = Object.keys(answers).length;
   const pct = (done / total * 100).toFixed(1);
   const fill = document.getElementById('progress-fill');
@@ -1435,7 +1644,7 @@ function updateResult() {
   const risk = getRisk(total);
   const appName = document.getElementById('appname').value.trim() || 'Applikation';
   const answered = Object.keys(answers).length;
-  const totalQ = DIMS_DEF.reduce((a, d) => a + d.qs.length, 0);
+  const totalQ = DIMS_DEF.reduce((a, d) => a + getQs(d).length, 0);
 
   const triggers = [];
   if (scores[1] >= 4.2 && appType === 'kern') triggers.push('Daten/Integration ≥ 4.2 bei Kernapplikation');
@@ -1506,8 +1715,9 @@ async function saveToPortfolio() {
     type: appType,
     scores,
     total,
+    answers: { ...answers },
     answered: Object.keys(answers).length,
-    totalQ: DIMS_DEF.reduce((a, d) => a + d.qs.length, 0),
+    totalQ: DIMS_DEF.reduce((a, d) => a + getQs(d).length, 0),
     date: new Date().toLocaleDateString('de-CH')
   };
   portfolio = await getPortfolio();
@@ -1550,6 +1760,55 @@ function resetForm() {
   document.getElementById('save-btn').disabled = true;
 }
 
+function loadAppForEditing(appId) {
+  const app = portfolio.find(p => p.id === appId);
+  if (!app) return;
+
+  resetForm();
+
+  appType = app.type;
+  answers = app.answers ? { ...app.answers } : {};
+
+  document.getElementById('appname').value = app.name;
+  document.getElementById('btn-kern').classList.toggle('active', app.type === 'kern');
+  document.getElementById('btn-support').classList.toggle('active', app.type === 'support');
+
+  document.getElementById('locked-state').style.display = 'none';
+  document.getElementById('dims-container').style.display = 'flex';
+  document.getElementById('progress-row').style.display = 'flex';
+
+  renderDims();
+  updateWeights();
+
+  DIMS_DEF.forEach(d => {
+    getQs(d).forEach((_, i) => {
+      const val = answers[d.id + '_' + i];
+      if (val) {
+        d.qs[i].opts.forEach((__, v) => {
+          const btn = document.getElementById(`qopt-${d.id}-${i}-${v+1}`);
+          if (btn) btn.className = 'q-opt' + (v + 1 === val ? ' sel-' + val : '');
+        });
+        const item = document.getElementById(`qitem-${d.id}-${i}`);
+        if (item) item.classList.add('answered');
+      }
+    });
+    updateDimHeader(d.id);
+    const body = document.getElementById('dbody-' + d.id);
+    const chev = document.getElementById('chev-' + d.id);
+    if (body && dimScore(d.id) > 0) {
+      body.classList.add('open');
+      if (chev) chev.classList.add('open');
+    }
+  });
+
+  updateProgress();
+  updateResult();
+  updateSaveBtn();
+
+  showPage('assess');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 async function deleteApp(id) {
   portfolio = (await getPortfolio()).filter(p => p.id !== id);
   await savePortfolioData(portfolio);
@@ -1575,7 +1834,13 @@ function showPage(id, evt) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
-  if (evt && evt.currentTarget) evt.currentTarget.classList.add('active');
+  if (evt && evt.currentTarget) {
+    evt.currentTarget.classList.add('active');
+  } else {
+    const tabs = document.querySelectorAll('.nav-tab');
+    if (id === 'assess' && tabs[0]) tabs[0].classList.add('active');
+    if (id === 'portfolio' && tabs[1]) tabs[1].classList.add('active');
+  }
   if (id === 'portfolio') renderPortfolio();
 }
 
@@ -1615,7 +1880,7 @@ async function renderPortfolio() {
       </div>`;
     }).join('');
     return `
-      <div class="app-tile">
+      <div class="app-tile" onclick="openAppModal(${app.id})" title="Details und Handlungsoptionen">
         <button class="delete-btn" onclick="event.stopPropagation();deleteApp(${app.id})" title="Löschen">✕</button>
         <div class="app-tile-header">
           <div>
@@ -1628,6 +1893,10 @@ async function renderPortfolio() {
           </div>
         </div>
         <div class="app-tile-bars">${miniBars}</div>
+        <div style="margin-top:10px;font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px">
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="5"/><path d="M6 4v4M4 6h4"/></svg>
+          Details &amp; Handlungsoptionen
+        </div>
       </div>`;
   }).join('');
 
@@ -1713,7 +1982,307 @@ function renderRadar() {
     </div>`;
 }
 
+/* ══════════════════════════════════════════
+   MODAL + HANDLUNGSOPTIONEN
+   ══════════════════════════════════════════ */
+
+const ACTION_CATALOG = {
+  tech: {
+    label: 'Technologische Abhängigkeit',
+    color: '#4a6b8a',
+    actions: [
+      { minScore: 4.0, prio: 1, title: 'Sofortiger Architektur-Review einleiten', desc: 'Beauftragen Sie eine unabhängige Architekturanalyse zur Identifikation aller proprietären Komponenten und deren Ersetzbarkeit.' },
+      { minScore: 3.5, prio: 1, title: 'Proprietäre APIs inventarisieren und priorisieren', desc: 'Erstellen Sie ein vollständiges Register aller herstellergebundenen APIs, SDKs und Dienste mit Bewertung der Abhaengigkeit.' },
+      { minScore: 3.0, prio: 2, title: 'Portabilitätsstrategie entwickeln', desc: 'Definieren Sie eine mittelfristige Roadmap zur schrittweisen Migration auf offene Standards (OpenAPI, OIDC, Kubernetes).' },
+      { minScore: 2.5, prio: 2, title: 'Containerisierung prüfen und einführen', desc: 'Evaluieren Sie Docker/Kubernetes als Deploymentstrategie, um plattformunabhängige Betriebsfähigkeit herzustellen.' },
+      { minScore: 2.0, prio: 3, title: 'Offene Standards in neue Entwicklungen vorschreiben', desc: 'Verankern Sie in den Architekturprinzipien, dass neue Komponenten ausschliesslich offene, portable Standards nutzen dürfen.' },
+      { minScore: 1.0, prio: 4, title: 'Technologie-Monitoring aufrechterhalten', desc: 'Jährliche Überprüfung der genutzten Standards und Technologien auf proprietäre Drift.' }
+    ]
+  },
+  data: {
+    label: 'Daten & Integration',
+    color: '#4a7c5a',
+    actions: [
+      { minScore: 4.2, prio: 1, title: 'Daten-Exit-Test sofort durchführen', desc: 'Testen Sie unmittelbar, ob ein vollständiger Datenexport inkl. Metadaten, Historien und Konfigurationen tatsächlich möglich ist. Dokumentieren Sie Lücken.' },
+      { minScore: 3.5, prio: 1, title: 'Egress-Kosten verhandeln', desc: 'Fordern Sie vertragliche Obergrenzen oder Abschaffung von Datenabzugskosten. Verweisen Sie auf EU Data Act (ab 2027 reguliert).' },
+      { minScore: 3.0, prio: 2, title: 'Datenexport-Prozess aufbauen und automatisieren', desc: 'Etablieren Sie regelmässige, automatisierte Exporte in offene Formate (CSV, JSON, Parquet) als Sicherungsstrategie.' },
+      { minScore: 2.5, prio: 2, title: 'Integrationslandschaft dokumentieren', desc: 'Erfassen Sie alle anbieterabhängigen Schnittstellen, APIs und Datenflüsse in einem zentralen Integrationsregister.' },
+      { minScore: 2.0, prio: 3, title: 'Migrationstest für Kerndaten durchführen', desc: 'Führen Sie einen Proof-of-Portability durch: Exportieren Sie Testdaten und importieren Sie diese in ein alternatives System.' },
+      { minScore: 1.0, prio: 4, title: 'Datendokumentation aktuell halten', desc: 'Stellen Sie sicher, dass Datenmodell, Schnittstellen und Datenflüsse stets aktuell dokumentiert sind.' }
+    ]
+  },
+  contract: {
+    label: 'Vertrag & Kommerziell',
+    color: '#c4614a',
+    actions: [
+      { minScore: 4.0, prio: 1, title: 'Sofortige Vertragsprüfung durch Juristen', desc: 'Lassen Sie den aktuellen Vertrag auf Lock-in-Klauseln, fehlende Exit-Regelungen und unzulässige Bindungen prüfen. Identifizieren Sie Nachverhandlungspotenzial.' },
+      { minScore: 3.5, prio: 1, title: 'Exit-Klauseln in nächste Vertragsrunde einbringen', desc: 'Bestehen Sie bei der nächsten Verlängerung auf expliziten Portabilitätsverpflichtungen, Transitfristen und klar limitierten Exit-Kosten.' },
+      { minScore: 3.0, prio: 2, title: 'Bündelung aufbrechen und Einzelleistungen bewerten', desc: 'Analysieren Sie, welche gebündelten Leistungen einzeln ausgeschrieben werden könnten, um Preisdruck und Abhängigkeit zu reduzieren.' },
+      { minScore: 2.5, prio: 2, title: 'Kostentransparenz einfordern', desc: 'Verlangen Sie vom Anbieter eine vollständige Preisübersicht inkl. Skalierungskosten und Egress-Gebühren für die nächsten 3 Jahre.' },
+      { minScore: 2.0, prio: 3, title: 'Marktvergleich und Alternativangebote einholen', desc: 'Holen Sie parallel Angebote von Alternativanbietern ein – auch ohne Wechselabsicht schafft das Verhandlungsmacht.' },
+      { minScore: 1.0, prio: 4, title: 'Vertragskonditionen bei Verlängerung optimieren', desc: 'Nutzen Sie Verlängerungsverhandlungen aktiv, um Flexibilität, kürzere Laufzeiten und bessere Exit-Bedingungen zu sichern.' }
+    ]
+  },
+  ops: {
+    label: 'Operativ & Organisation',
+    color: '#6b5a8a',
+    actions: [
+      { minScore: 4.0, prio: 1, title: 'Internes Kompetenzprogramm sofort starten', desc: 'Identifizieren Sie die kritischsten Wissensabhängigkeiten und starten Sie sofort mit internem Know-how-Aufbau oder gezielten Einstellungen.' },
+      { minScore: 3.5, prio: 1, title: 'Wissenstransfer mit Anbieter vertraglich regeln', desc: 'Vereinbaren Sie mit dem Anbieter dokumentierten Wissenstransfer, Schulungspflichten und Übergabeunterstützung als Vertragsbestandteil.' },
+      { minScore: 3.0, prio: 2, title: 'Betriebsdokumentation vollständig erstellen', desc: 'Erstellen Sie ein vollständiges Betriebshandbuch: Architektur, Konfigurationen, Prozesse, Eskalationswege – unabhängig vom Anbieter.' },
+      { minScore: 2.5, prio: 2, title: 'Personelle Abhängigkeiten (Key-Person-Risiko) reduzieren', desc: 'Verteilen Sie kritisches Betriebswissen auf mindestens zwei interne Personen. Etablieren Sie Pair-Operations für sensible Systeme.' },
+      { minScore: 2.0, prio: 3, title: 'Abhängigkeit von Managed Services schrittweise reduzieren', desc: 'Evaluieren Sie, welche Managed-Service-Anteile intern oder durch neutrale Dritte übernommen werden könnten.' },
+      { minScore: 1.0, prio: 4, title: 'Schulungsplan für Weiterentwicklung erstellen', desc: 'Stellen Sie sicher, dass das Team regelmässig geschult wird, um technologische Kompetenz langfristig intern zu halten.' }
+    ]
+  },
+  exit: {
+    label: 'Exit-Fähigkeit',
+    color: '#b8823a',
+    actions: [
+      { minScore: 4.0, prio: 1, title: 'Exit-Plan als Sofortmassnahme erstellen', desc: 'Erstellen Sie innerhalb von 30 Tagen einen dokumentierten Exit-Plan: Phasen, Verantwortliche, Zeitfenster, Alternativanbieter, Datenmigration.' },
+      { minScore: 3.5, prio: 1, title: 'Proof of Portability durchführen', desc: 'Testen Sie innerhalb von 60 Tagen, ob ein Re-Hosting oder Re-Platforming technisch und zeitlich realistisch wäre. Dokumentieren Sie Erkenntnisse.' },
+      { minScore: 3.0, prio: 2, title: 'Alternativanbieter evaluieren und vorqualifizieren', desc: 'Erstellen Sie eine Shortlist von mindestens zwei Alternativanbietern mit Funktionsvergleich, Kostenschätzung und Migrationskomplexität.' },
+      { minScore: 2.5, prio: 2, title: 'Migrationspfad definieren und dokumentieren', desc: 'Beschreiben Sie Schritt für Schritt, wie eine Migration ablaufen würde – inklusive Rollback-Szenario und Kommunikationsplan.' },
+      { minScore: 2.0, prio: 3, title: 'Exit-Plan jährlich testen und aktualisieren', desc: 'Führen Sie einmal jährlich eine Simulation oder einen Teiltest durch, um die Praxistauglichkeit des Exit-Plans zu validieren.' },
+      { minScore: 1.0, prio: 4, title: 'Exit-Dokumentation aktuell halten', desc: 'Stellen Sie sicher, dass Exit-Plan, Dokumentation und Alternativliste bei jeder wesentlichen Systemänderung aktualisiert werden.' }
+    ]
+  },
+  biz: {
+    label: 'Geschäftskritikalität',
+    color: '#a05070',
+    actions: [
+      { minScore: 4.5, prio: 1, title: 'Eskalation an Geschäftsleitung und Board', desc: 'Informieren Sie die Geschäftsleitung über das strategische Risiko. Beantragen Sie Budget und Mandat für ein dediziertes Lock-in-Reduktionsprogramm.' },
+      { minScore: 3.5, prio: 1, title: 'Notfallplan für Anbieterausfall erstellen', desc: 'Definieren Sie, was im Fall einer kurzfristigen Nichtverfügbarkeit des Anbieters passiert: Notfallprozesse, manuelle Alternativen, Kommunikation.' },
+      { minScore: 3.0, prio: 2, title: 'Risikoszenario quantifizieren', desc: 'Berechnen Sie den potenziellen Schaden bei Anbieterausfall oder erzwungenem Wechsel in CHF/EUR: Umsatzverlust, Migrationskosten, Reputationsschaden.' },
+      { minScore: 2.5, prio: 2, title: 'Kundenkommunikationsplan für Migrationsszenario vorbereiten', desc: 'Bereiten Sie vor, wie Kunden im Fall einer Migration informiert und begleitet würden, um Vertrauensverlust zu minimieren.' },
+      { minScore: 2.0, prio: 3, title: 'Compliance-Anforderungen für Wechselszenarien prüfen', desc: 'Klären Sie mit Datenschutz- und Compliance-Verantwortlichen, welche regulatorischen Anforderungen bei einem Anbieterwechsel zu erfüllen wären.' },
+      { minScore: 1.0, prio: 4, title: 'Jährliches Risiko-Monitoring einplanen', desc: 'Überprüfen Sie einmal jährlich, ob sich Geschäftsrelevanz oder Anbieter-Risikoprofil wesentlich verändert haben.' }
+    ]
+  }
+};
+
+const PRIO_LABELS = { 1: 'Sofort', 2: 'Kurzfristig', 3: 'Mittelfristig', 4: 'Laufend' };
+const PRIO_SECTIONS = [
+  { prio: 1, label: 'Sofortmassnahmen' },
+  { prio: 2, label: 'Kurzfristige Massnahmen (1–3 Monate)' },
+  { prio: 3, label: 'Mittelfristige Massnahmen (3–12 Monate)' },
+  { prio: 4, label: 'Laufende Massnahmen' }
+];
+
+let currentModalAppId = null;
+
+function openAppModal(appId) {
+  const app = portfolio.find(p => p.id === appId);
+  if (!app) return;
+  currentModalAppId = appId;
+
+  const risk = getRisk(app.total);
+
+  document.getElementById('modal-app-name').textContent = app.name;
+  document.getElementById('modal-app-meta').textContent =
+    (app.type === 'kern' ? 'Kernapplikation' : 'Supportapplikation') + ' · Bewertet am ' + app.date;
+  document.getElementById('modal-score-num').textContent = app.total.toFixed(2);
+  document.getElementById('modal-score-num').style.color = risk.col;
+
+  const pill = document.getElementById('modal-risk-pill');
+  pill.textContent = 'Risiko: ' + risk.label;
+  pill.style.color = risk.col;
+  pill.style.background = risk.bg;
+  pill.style.borderColor = risk.border;
+
+  document.getElementById('modal-answered').textContent =
+    (app.answered || 0) + ' von ' + (app.totalQ || 39) + ' Fragen beantwortet';
+
+  document.getElementById('modal-edit-btn').onclick = () => {
+    closeModalDirect();
+    loadAppForEditing(appId);
+  };
+
+  renderHandlungsoptionen(app);
+  switchModalTab(0, document.querySelector('.modal-tab'));
+  document.getElementById('app-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('app-modal')) closeModalDirect();
+}
+
+function closeModalDirect() {
+  document.getElementById('app-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function switchModalTab(idx, btn) {
+  document.querySelectorAll('.modal-tab').forEach((t, i) => t.classList.toggle('active', i === idx));
+  document.querySelectorAll('.modal-tab-panel').forEach((p, i) => p.classList.toggle('active', i === idx));
+}
+
+
+const ACTION_CATALOG_SUPPORT = {
+  tech: {
+    label: 'Technologische Abhängigkeit',
+    color: '#4a6b8a',
+    actions: [
+      { minScore: 4.0, prio: 1, title: 'Alternativen am Markt evaluieren', desc: 'Erstellen Sie eine Shortlist von 2–3 funktionsgleichen Alternativen und schätzen Sie den Wechselaufwand grob ein.' },
+      { minScore: 3.0, prio: 2, title: 'Wechselaufwand dokumentieren', desc: 'Halten Sie fest, was ein Wechsel technisch bedeuten würde — Datenexport, Schnittstellen, Einführungsaufwand.' },
+      { minScore: 2.0, prio: 3, title: 'Bei Neubeschaffung auf offene Formate achten', desc: 'Verankern Sie als Beschaffungskriterium, dass künftige Supporttools offene Exportformate und Standard-APIs unterstützen müssen.' },
+      { minScore: 1.0, prio: 4, title: 'Marktentwicklung beobachten', desc: 'Verfolgen Sie einmal jährlich, ob neue Anbieter oder Technologien den Markt für diesen Bereich verändern.' }
+    ]
+  },
+  data: {
+    label: 'Daten & Integration',
+    color: '#4a7c5a',
+    actions: [
+      { minScore: 3.5, prio: 1, title: 'Datenexport testen und dokumentieren', desc: 'Überprüfen Sie, welche Daten exportiert werden können, und dokumentieren Sie allfällige Lücken für den nächsten Vertragsdialog.' },
+      { minScore: 3.0, prio: 2, title: 'Regelmässigen Datenexport als Backup einrichten', desc: 'Richten Sie einen periodischen Datenabzug ein — monatlich oder quartalsweise — um Datenverfügbarkeit unabhängig vom Anbieter sicherzustellen.' },
+      { minScore: 2.0, prio: 3, title: 'Schnittstellen zu anderen Systemen dokumentieren', desc: 'Erfassen Sie, welche Systeme Daten mit dieser Applikation austauschen, damit ein Wechsel ohne Überraschungen geplant werden kann.' },
+      { minScore: 1.0, prio: 4, title: 'Datenformat bei Verlängerung prüfen', desc: 'Bestätigen Sie bei Vertragsverlängerung, dass Daten weiterhin in offenen Formaten exportierbar bleiben.' }
+    ]
+  },
+  contract: {
+    label: 'Vertrag & Kommerziell',
+    color: '#c4614a',
+    actions: [
+      { minScore: 4.0, prio: 1, title: 'Vertragskonditionen aktiv nachverhandeln', desc: 'Nutzen Sie die nächste Verlängerungsrunde, um kürzere Laufzeiten, transparentere Preise und einfachere Kündigungsoptionen zu erreichen.' },
+      { minScore: 3.0, prio: 2, title: 'Marktvergleich als Verhandlungsgrundlage einholen', desc: 'Holen Sie Vergleichsangebote von Alternativanbietern ein — das stärkt Ihre Verhandlungsposition erheblich.' },
+      { minScore: 2.5, prio: 2, title: 'Bündelung auf Sinnhaftigkeit prüfen', desc: 'Analysieren Sie, ob die gebündelten Leistungen tatsächlich genutzt werden oder ob eine Einzellösung günstiger käme.' },
+      { minScore: 2.0, prio: 3, title: 'Kündigungsfrist im Kalender vormerken', desc: 'Stellen Sie sicher, dass Kündigungsfristen rechtzeitig bekannt sind und automatische Verlängerungen nicht unbemerkt greifen.' },
+      { minScore: 1.0, prio: 4, title: 'Preisstruktur jährlich überprüfen', desc: 'Vergleichen Sie die Kosten einmal jährlich mit dem Markt und prüfen Sie, ob das Preis-Leistungs-Verhältnis noch stimmt.' }
+    ]
+  },
+  ops: {
+    label: 'Operativ & Organisation',
+    color: '#6b5a8a',
+    actions: [
+      { minScore: 3.5, prio: 2, title: 'Einführungs- und Schulungsaufwand für Wechsel schätzen', desc: 'Schätzen Sie, wie viele Stunden Schulung und Begleitung ein Wechsel für die Nutzenden bedeuten würde — als Entscheidungsgrundlage.' },
+      { minScore: 3.0, prio: 2, title: 'Change-Management-Konzept für Wechselszenario vorbereiten', desc: 'Skizzieren Sie, wie Mitarbeitende bei einem Tool-Wechsel informiert, geschult und begleitet werden würden.' },
+      { minScore: 2.0, prio: 3, title: 'Betriebswissen auf mehrere Personen verteilen', desc: 'Stellen Sie sicher, dass nicht nur eine Person weiss, wie das Tool administriert und gewartet wird.' },
+      { minScore: 1.0, prio: 4, title: 'Tool-Zufriedenheit periodisch messen', desc: 'Fragen Sie Nutzende einmal jährlich, ob das Tool ihren Bedürfnissen entspricht — das liefert frühzeitig Hinweise auf Wechselbedarf.' }
+    ]
+  },
+  exit: {
+    label: 'Exit-Fähigkeit',
+    color: '#b8823a',
+    actions: [
+      { minScore: 4.0, prio: 1, title: 'Konkrete Alternativanbieter evaluieren', desc: 'Erstellen Sie eine Shortlist mit 2–3 Alternativen inkl. Funktionsvergleich, Kostenschätzung und Migrationszeitrahmen.' },
+      { minScore: 3.0, prio: 2, title: 'Einfachen Exit-Plan erstellen', desc: 'Halten Sie in einem kurzen Dokument fest, wie ein Wechsel in 3–4 Schritten ablaufen würde — Datenexport, Vertragsende, Einführung Alternative.' },
+      { minScore: 2.5, prio: 2, title: 'Datenportabilität im Vertrag sichern', desc: 'Lassen Sie bei der nächsten Verlängerung eine Klausel einbauen, die vollständigen Datenexport bei Vertragsende garantiert.' },
+      { minScore: 2.0, prio: 3, title: 'Wechselfähigkeit einmal jährlich prüfen', desc: 'Überprüfen Sie einmal pro Jahr, ob Datenexport und Alternativanbieter noch aktuell und realistisch sind.' },
+      { minScore: 1.0, prio: 4, title: 'Alternativen im Markt verfolgen', desc: 'Behalten Sie den Markt im Blick und notieren Sie interessante Alternativen, auch wenn kein Wechsel geplant ist.' }
+    ]
+  },
+  biz: {
+    label: 'Betriebliche Auswirkung',
+    color: '#a05070',
+    actions: [
+      { minScore: 4.0, prio: 1, title: 'Notfalllösung für kurzfristigen Ausfall definieren', desc: 'Legen Sie fest, wie der Betrieb bei einem mehrtägigen Ausfall aufrechterhalten wird — z. B. manuelle Prozesse, Excel-Alternativen.' },
+      { minScore: 3.0, prio: 2, title: 'Wechselbereitschaft im Team klären', desc: 'Sprechen Sie mit den Hauptnutzenden, ob und unter welchen Bedingungen sie einen Wechsel unterstützen würden.' },
+      { minScore: 2.5, prio: 3, title: 'Gesamtkosten eines Wechsels grob kalkulieren', desc: 'Schätzen Sie Lizenzkosten, Migrationsaufwand und Schulungen für eine Alternative — als Grundlage für künftige Make-or-Buy-Entscheide.' },
+      { minScore: 2.0, prio: 3, title: 'Nutzungsanalyse durchführen', desc: 'Prüfen Sie, ob alle bezahlten Funktionen tatsächlich genutzt werden — oft sind Supporttools überdimensioniert.' },
+      { minScore: 1.0, prio: 4, title: 'Jährlichen Nutzwert-Check einplanen', desc: 'Überprüfen Sie einmal jährlich, ob das Tool noch den aktuellen Anforderungen entspricht und keine kostengünstigere Alternative sinnvoller wäre.' }
+    ]
+  }
+};
+
+function renderHandlungsoptionen(app) {
+  const dimIds = ['tech','data','contract','ops','exit','biz'];
+  const catalog = app.type === 'support' ? ACTION_CATALOG_SUPPORT : ACTION_CATALOG;
+  const scores = app.scores || [];
+
+  const allActions = [];
+  dimIds.forEach((dimId, i) => {
+    const score = scores[i] || 0;
+    if (!score) return;
+    const cat = catalog[dimId];
+    cat.actions.forEach(a => {
+      if (score >= a.minScore) {
+        allActions.push({ ...a, dimId, dimLabel: cat.label, dimColor: cat.color, score });
+      }
+    });
+  });
+
+  allActions.sort((a, b) => a.prio - b.prio || b.score - a.score);
+
+  const byPrio = {};
+  allActions.forEach(a => {
+    if (!byPrio[a.prio]) byPrio[a.prio] = [];
+    if (byPrio[a.prio].length < 5) byPrio[a.prio].push(a);
+  });
+
+  let html = '';
+
+  const risk = getRisk(app.total);
+  html += `<div style="background:${risk.bg};border:1px solid ${risk.border};border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:20px;font-size:13px;color:${risk.col};line-height:1.55">
+    <strong>Gesamtrisiko: ${risk.label} (${app.total.toFixed(2)})</strong><br>
+    ${app.type === 'support'
+      ? (risk.label === 'Kritisch' ? 'Wechsel oder Neuausschreibung prüfen. Vertragliche und operative Abhängigkeiten reduzieren.' :
+         risk.label === 'Erhöht' ? 'Mittelfristiger Handlungsbedarf. Vertrag und Alternativen aktiv prüfen.' :
+         risk.label === 'Moderat' ? 'Gut beherrschbar. Vertragsoptimierung und Marktbeobachtung empfohlen.' :
+         'Geringe Abhängigkeit. Periodisches Monitoring genügt.')
+      : (risk.label === 'Kritisch' ? 'Unmittelbarer Handlungsbedarf auf mehreren Ebenen. Eskalation empfohlen.' :
+         risk.label === 'Erhöht' ? 'Aktiver Steuerungsbedarf. Konkrete Massnahmen zeitnah einleiten.' :
+         risk.label === 'Moderat' ? 'Beobachtungsbedarf. Massnahmen mittelfristig einplanen.' :
+         'Situation gut beherrscht. Laufendes Monitoring genügt.')}
+  </div>`;
+
+  if (allActions.length === 0) {
+    html += '<p style="font-size:14px;color:var(--text2)">Noch zu wenige Fragen beantwortet. Füllen Sie den Fragebogen vollständiger aus, um spezifische Handlungsoptionen zu erhalten.</p>';
+  } else {
+    PRIO_SECTIONS.forEach(sec => {
+      const items = byPrio[sec.prio];
+      if (!items || !items.length) return;
+      html += `<div class="action-section">
+        <div class="action-section-title">${sec.label}</div>`;
+      items.forEach(a => {
+        html += `<div class="action-item">
+          <div class="action-prio p${a.prio}">${a.prio}</div>
+          <div class="action-text">
+            <div class="action-title">${a.title}</div>
+            <div class="action-desc">${a.desc}</div>
+          </div>
+          <div class="action-dim-tag" style="border-color:${a.dimColor}20;color:${a.dimColor}">${a.dimLabel}</div>
+        </div>`;
+      });
+      html += '</div>';
+    });
+  }
+
+  document.getElementById('modal-panel-0').innerHTML = html;
+}
+
 </script>
+
+<!-- APP MODAL -->
+<div class="modal-backdrop" id="app-modal" onclick="closeModal(event)">
+  <div class="modal-box" id="modal-box">
+    <div class="modal-header">
+      <div>
+        <div class="modal-app-name" id="modal-app-name"></div>
+        <div class="modal-app-meta" id="modal-app-meta"></div>
+      </div>
+      <button class="modal-close" onclick="closeModalDirect()">&#x2715;</button>
+    </div>
+    <div class="modal-score-row">
+      <div class="modal-score-num" id="modal-score-num"></div>
+      <div>
+        <span class="modal-risk-pill" id="modal-risk-pill"></span>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px" id="modal-answered"></div>
+      </div>
+    </div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" onclick="switchModalTab(0,this)">Handlungsoptionen</button>
+      <button class="modal-tab" onclick="switchModalTab(1,this)">Bewertung bearbeiten</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-tab-panel active" id="modal-panel-0"></div>
+      <div class="modal-tab-panel" id="modal-panel-1">
+        <p style="font-size:14px;color:var(--text2);margin-bottom:20px;line-height:1.6">Wechseln Sie in den Bewertungsmodus, um alle Fragen einzusehen und Antworten zu ändern. Bestehende Antworten sind vorausgefüllt.</p>
+        <button class="modal-edit-btn" id="modal-edit-btn">Bewertung öffnen und bearbeiten</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 </div><!-- /main-app -->
 </body>
