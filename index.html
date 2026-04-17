@@ -2091,6 +2091,58 @@ function renderRadar() {
     </div>`;
 }
 
+let currentModalAppId = null;
+
+function openAppModal(appId) {
+  const app = portfolio.find(p => p.id === appId);
+  if (!app) return;
+  currentModalAppId = appId;
+  const risk = getRisk(app.total);
+
+  document.getElementById('modal-app-name').textContent = app.name;
+  document.getElementById('modal-app-meta').textContent =
+    (app.type === 'kern' ? 'Kernapplikation' : 'Supportapplikation') + ' · Bewertet am ' + app.date;
+  document.getElementById('modal-score-num').textContent = app.total.toFixed(2);
+  document.getElementById('modal-score-num').style.color = risk.col;
+
+  const lockInIndex = Math.round((app.total - 1) / 4 * 100);
+  const idxEl = document.getElementById('modal-lockin-index');
+  if (idxEl) idxEl.textContent = 'Lock-in Index: ' + lockInIndex + ' / 100';
+
+  const pill = document.getElementById('modal-risk-pill');
+  pill.textContent = 'Risiko: ' + risk.label;
+  pill.style.color = risk.col;
+  pill.style.background = risk.bg;
+  pill.style.borderColor = risk.border;
+
+  document.getElementById('modal-answered').textContent =
+    (app.answered || 0) + ' von ' + (app.totalQ || 30) + ' Fragen beantwortet';
+
+  document.getElementById('modal-edit-btn').onclick = () => {
+    closeModalDirect();
+    loadAppForEditing(appId);
+  };
+
+  renderHandlungsoptionen(app);
+  switchModalTab(0, document.querySelectorAll('.modal-tab')[0]);
+  document.getElementById('app-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('app-modal')) closeModalDirect();
+}
+
+function closeModalDirect() {
+  document.getElementById('app-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function switchModalTab(idx, btn) {
+  document.querySelectorAll('.modal-tab').forEach((t, i) => t.classList.toggle('active', i === idx));
+  document.querySelectorAll('.modal-tab-panel').forEach((p, i) => p.classList.toggle('active', i === idx));
+}
+
 function renderHandlungsoptionen(app) {
   const dimIds = ['tech','econ','org','legal','strat','res'];
   const catalog = app.type === 'support' ? ACTION_CATALOG_SUPPORT : ACTION_CATALOG;
