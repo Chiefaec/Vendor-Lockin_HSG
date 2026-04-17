@@ -748,6 +748,85 @@ body {
   display: none;
 }
 
+
+/* ─── INDUSTRY DROPDOWN ─── */
+.sector-wrap { position:relative; text-align:left; }
+.sector-search {
+  width:100%; padding:11px 14px 11px 36px; font-size:14px;
+  font-family:'DM Sans',sans-serif; border:1px solid var(--border2);
+  border-radius:var(--radius-sm); background:var(--surface2); color:var(--text);
+  outline:none; transition:border-color .2s,background .2s,box-shadow .2s;
+}
+.sector-search:focus { border-color:var(--accent); background:var(--surface); box-shadow:0 0 0 3px rgba(74,124,111,.12); }
+.sector-search-icon { position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--text3); pointer-events:none; }
+.sector-dropdown {
+  position:absolute; top:calc(100% + 4px); left:0; right:0;
+  background:var(--surface); border:1px solid var(--border2);
+  border-radius:var(--radius-sm); box-shadow:var(--shadow-md);
+  max-height:220px; overflow-y:auto; z-index:50; display:none;
+}
+.sector-dropdown.open { display:block; }
+.sector-opt {
+  padding:10px 14px; font-size:13px; color:var(--text2); cursor:pointer;
+  border-bottom:1px solid var(--border); transition:background .1s;
+}
+.sector-opt:last-child { border-bottom:none; }
+.sector-opt:hover, .sector-opt.focused { background:var(--surface2); color:var(--text); }
+.sector-opt.selected { background:var(--accent-light); color:var(--accent); font-weight:500; }
+.sector-selected-pill {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:5px 12px; background:var(--accent-light); border:1px solid var(--accent-mid);
+  border-radius:99px; font-size:13px; color:var(--accent); margin-top:6px;
+}
+
+/* ─── ADMIN BADGE ─── */
+.admin-badge {
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:11px; font-weight:500; padding:3px 10px;
+  border-radius:99px; background:#f5e8e8; color:#6e1a1a;
+  border:1px solid #d89090;
+}
+.admin-login-link {
+  font-size:11px; color:var(--text3); text-align:center;
+  cursor:pointer; margin-top:8px; text-decoration:underline;
+  text-underline-offset:2px;
+}
+.admin-login-link:hover { color:var(--text2); }
+.admin-modal-backdrop {
+  display:none; position:fixed; inset:0; background:rgba(0,0,0,.32);
+  z-index:300; align-items:center; justify-content:center; padding:24px;
+}
+.admin-modal-backdrop.open { display:flex; }
+.admin-modal {
+  background:var(--surface); border-radius:16px; padding:32px 28px;
+  width:100%; max-width:360px; box-shadow:var(--shadow-md);
+}
+.admin-modal h3 { font-family:'DM Serif Display',serif; font-size:20px; margin-bottom:6px; }
+.admin-modal p { font-size:13px; color:var(--text2); margin-bottom:20px; line-height:1.5; }
+
+/* ─── ADMIN PORTFOLIO ─── */
+.industry-section { margin-bottom:28px; }
+.industry-section-head {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 18px; background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--border-radius-lg); cursor:pointer; margin-bottom:8px;
+  box-shadow:var(--shadow); transition:box-shadow .15s;
+}
+.industry-section-head:hover { box-shadow:var(--shadow-md); }
+.industry-name { font-size:15px; font-weight:500; }
+.industry-meta { font-size:12px; color:var(--text3); margin-top:2px; }
+.industry-score { font-family:'DM Serif Display',serif; font-size:26px; line-height:1; }
+.firm-row {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 16px; background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius-sm); margin-bottom:6px; font-size:13px;
+  cursor:pointer; transition:background .12s;
+}
+.firm-row:hover { background:var(--surface2); }
+.firm-row-name { font-weight:500; color:var(--text); }
+.firm-row-meta { font-size:11px; color:var(--text3); margin-top:1px; }
+.admin-compare-chart { margin-top:20px; }
+
 /* ─── NAV FIRM BADGE ─── */
 .nav-firm-badge {
   display: flex;
@@ -941,16 +1020,35 @@ body {
       </svg>
     </div>
     <div class="login-title">Vendor-Lockin Bewertung</div>
-    <div class="login-subtitle">Geben Sie den Namen Ihres Unternehmens ein, um Ihre firmeneigene Bewertungsumgebung zu öffnen oder neu zu erstellen.</div>
+    <div class="login-subtitle">Geben Sie Firmennamen und Branche ein, um Ihre firmeneigene Bewertungsumgebung zu öffnen oder neu zu erstellen.</div>
     <div class="login-form">
       <input type="text" class="login-input" id="firm-input" placeholder="Firmenname eingeben …" oninput="onFirmInput()" onkeydown="if(event.key==='Enter')doLogin()">
+      <div class="sector-wrap" id="sector-wrap" style="display:none">
+        <span class="sector-search-icon">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4.5"/><path d="M10.5 10.5l3 3"/></svg>
+        </span>
+        <input type="text" class="sector-search" id="sector-search" placeholder="Branche suchen oder wählen …" oninput="filterSectors()" onfocus="openSectorDropdown()" autocomplete="off">
+        <div class="sector-dropdown" id="sector-dropdown"></div>
+        <div id="sector-chosen" style="display:none"></div>
+      </div>
       <div class="login-error" id="login-error">Bitte geben Sie einen gültigen Firmennamen ein.</div>
       <button class="login-btn" id="login-btn" onclick="doLogin()" disabled>Weiter</button>
     </div>
-    <div class="login-firms" id="login-firms" style="display:none">
-      <div class="login-firms-title">Zuletzt verwendet</div>
-      <div id="firm-chips"></div>
+    <div style="margin-top:8px">
+      <span class="admin-login-link" onclick="openAdminModal()">Admin-Zugang</span>
     </div>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN MODAL -->
+<div class="admin-modal-backdrop" id="admin-modal-wrap" onclick="closeAdminModal(event)">
+  <div class="admin-modal">
+    <h3>Admin-Zugang</h3>
+    <p>Nur für autorisierte Administratoren. Gibt Einblick in alle Firmenbewertungen und Branchenvergleiche.</p>
+    <input type="password" class="login-input" id="admin-pw-input" placeholder="Passwort …" style="margin-bottom:10px;text-align:left" onkeydown="if(event.key==='Enter')doAdminLogin()">
+    <div class="login-error" id="admin-pw-error" style="margin-bottom:10px">Falsches Passwort.</div>
+    <button class="login-btn" onclick="doAdminLogin()">Als Admin einloggen</button>
+    <div style="text-align:center;margin-top:12px"><span class="admin-login-link" onclick="closeAdminModal()">Abbrechen</span></div>
   </div>
 </div>
 
@@ -973,9 +1071,10 @@ body {
       <span style="font-size:12px;color:var(--text3)">Firma:</span>
       <span class="nav-firm-name" id="nav-firm-name"></span>
     </div>
-    <div class="nav-tabs">
+    <div class="nav-tabs" id="main-nav-tabs">
       <button class="nav-tab active" onclick="showPage('assess',event)">Bewertung</button>
       <button class="nav-tab" onclick="showPage('portfolio',event)">Portfolio <span class="nav-count" id="nav-count">0</span></button>
+      <button class="nav-tab" id="admin-nav-tab" onclick="showPage('admin',event)" style="display:none">Admin <span class="admin-badge" style="margin-left:4px">Admin</span></button>
     </div>
     <button class="nav-logout-btn" onclick="doLogout()">Abmelden</button>
   </div>
@@ -1504,10 +1603,15 @@ let answers = {};
    ══════════════════════════════════════════ */
 
 let currentFirm = null;
+let currentSector = '';
 let portfolio = [];
 
 async function apiGet(path) {
-  const r = await fetch(path);
+  const headers = {};
+  if (currentFirm === '__admin__' || path.includes('/api/admin')) {
+    headers['X-Admin-Token'] = 'VLI-HSG-2025';
+  }
+  const r = await fetch(path, { headers });
   if (!r.ok) throw new Error('API error ' + r.status);
   return r.json();
 }
@@ -1977,15 +2081,18 @@ function updateNavCount() {
 function showPage(id, evt) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('page-' + id).classList.add('active');
+  const pg = document.getElementById('page-' + id);
+  if (pg) pg.classList.add('active');
   if (evt && evt.currentTarget) {
     evt.currentTarget.classList.add('active');
   } else {
     const tabs = document.querySelectorAll('.nav-tab');
     if (id === 'assess' && tabs[0]) tabs[0].classList.add('active');
     if (id === 'portfolio' && tabs[1]) tabs[1].classList.add('active');
+    if (id === 'admin' && tabs[2]) tabs[2].classList.add('active');
   }
   if (id === 'portfolio') renderPortfolio();
+  if (id === 'admin') renderAdminView();
 }
 
 const RADAR_COLORS = ['#4a6b8a','#4a7c5a','#c4614a','#6b5a8a','#b8823a','#a05070','#2d8a7a','#7a6a3a'];
@@ -2499,6 +2606,22 @@ function renderHandlungsoptionen(app) {
         <p style="font-size:14px;color:var(--text2);margin-bottom:20px;line-height:1.6">Wechseln Sie in den Bewertungsmodus, um alle Fragen einzusehen und Antworten zu ändern. Bestehende Antworten sind vorausgefüllt.</p>
         <button class="modal-edit-btn" id="modal-edit-btn">Bewertung öffnen und bearbeiten</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PAGE -->
+<div class="page" id="page-admin">
+  <div class="portfolio-wrap">
+    <div class="portfolio-header">
+      <div>
+        <h2>Admin — Branchenübersicht</h2>
+        <p>Alle Firmenbewertungen nach Branche aggregiert</p>
+      </div>
+      <span class="admin-badge">Admin-Modus</span>
+    </div>
+    <div id="admin-content">
+      <div style="padding:40px;text-align:center;color:var(--text3);font-size:14px">Daten werden geladen …</div>
     </div>
   </div>
 </div>
