@@ -1651,16 +1651,71 @@ async function deleteAllPortfolioData() {
   } catch (e) { console.error('Löschen fehlgeschlagen', e); }
 }
 
-/* ── LOGIN ── */
+/* ── SECTORS ── */
+const SECTORS = [
+  'Banken & Finanzdienstleistungen','Versicherungen','Gesundheitswesen & Pharma',
+  'Detailhandel & E-Commerce','Lebensmittel & Konsumgüter','Energie & Versorgung',
+  'Telekommunikation','Informationstechnologie & Software','Medien & Unterhaltung',
+  'Bildung & Forschung','Öffentliche Verwaltung & Behörden','Gesundheits- & Sozialwesen',
+  'Logistik & Transport','Immobilien & Bauwesen','Automotive & Maschinenbau',
+  'Chemie & Life Sciences','Luft- & Raumfahrt','Landwirtschaft & Agrarwirtschaft',
+  'Tourismus & Gastgewerbe','Medizintechnik','Beratung & Professional Services',
+  'Non-Profit & NGO','Rechtswesen','Architektur & Ingenieurwesen','Rohstoffe & Bergbau'
+];
+let selectedSector = '';
+
 function onFirmInput() {
   const val = document.getElementById('firm-input').value.trim();
-  document.getElementById('login-btn').disabled = val.length < 2;
+  const wrap = document.getElementById('sector-wrap');
+  if (wrap) wrap.style.display = val.length >= 2 ? 'block' : 'none';
+  checkLoginReady();
   document.getElementById('login-error').style.display = 'none';
 }
 
+function checkLoginReady() {
+  const name = document.getElementById('firm-input').value.trim();
+  document.getElementById('login-btn').disabled = !(name.length >= 2 && selectedSector);
+}
+
+function openSectorDropdown() {
+  filterSectors();
+  document.getElementById('sector-dropdown').classList.add('open');
+}
+
+function filterSectors() {
+  const q = (document.getElementById('sector-search').value || '').toLowerCase();
+  const dd = document.getElementById('sector-dropdown');
+  const filtered = SECTORS.filter(s => s.toLowerCase().includes(q));
+  dd.innerHTML = filtered.length
+    ? filtered.map(s => `<div class="sector-opt${s===selectedSector?' selected':''}" onmousedown="selectSector('${s.replace(/'/g,"\\'")}')">${s}</div>`).join('')
+    : `<div style="padding:12px 14px;font-size:13px;color:var(--text3)">Keine Treffer</div>`;
+  dd.classList.add('open');
+}
+
+function selectSector(s) {
+  selectedSector = s;
+  document.getElementById('sector-search').value = s;
+  document.getElementById('sector-dropdown').classList.remove('open');
+  const pill = document.getElementById('sector-chosen');
+  if (pill) {
+    pill.style.display = 'block';
+    pill.innerHTML = `<span class="sector-selected-pill"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 6l3 3 5-5"/></svg>${s}</span>`;
+  }
+  checkLoginReady();
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.sector-wrap')) {
+    const dd = document.getElementById('sector-dropdown');
+    if (dd) dd.classList.remove('open');
+  }
+});
+
+/* ── LOGIN ── */
 async function doLogin() {
   const name = document.getElementById('firm-input').value.trim();
-  if (name.length < 2) {
+  if (name.length < 2 || !selectedSector) {
+    document.getElementById('login-error').textContent = 'Bitte Firmennamen und Branche angeben.';
     document.getElementById('login-error').style.display = 'block';
     return;
   }
@@ -1668,14 +1723,17 @@ async function doLogin() {
   btn.textContent = 'Laden …';
   btn.disabled = true;
   try {
-    await apiPost('/api/firms', { firm: name });
+    await apiPost('/api/firms', { firm: name, sector: selectedSector });
     currentFirm = name;
+    currentSector = selectedSector;
     portfolio = await getPortfolio();
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('main-app').style.display = 'block';
     document.getElementById('nav-firm-name').textContent = name;
+    const adminTab = document.getElementById('admin-nav-tab');
+    if (adminTab) adminTab.style.display = 'none';
     updateNavCount();
-  } catch {
+  } catch (err) {
     document.getElementById('login-error').textContent = 'Verbindung fehlgeschlagen. Bitte erneut versuchen.';
     document.getElementById('login-error').style.display = 'block';
     btn.textContent = 'Weiter';
@@ -1685,37 +1743,164 @@ async function doLogin() {
 
 function doLogout() {
   currentFirm = null;
+  currentSector = '';
+  selectedSector = '';
   portfolio = [];
   resetForm();
   document.getElementById('main-app').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('firm-input').value = '';
+  const ss = document.getElementById('sector-search');
+  if (ss) ss.value = '';
+  const sc = document.getElementById('sector-chosen');
+  if (sc) sc.style.display = 'none';
+  const sw = document.getElementById('sector-wrap');
+  if (sw) sw.style.display = 'none';
   document.getElementById('login-btn').disabled = true;
   document.getElementById('login-btn').textContent = 'Weiter';
-  renderFirmChips();
 }
 
-async function renderFirmChips() {
-  const container = document.getElementById('firm-chips');
-  const wrap = document.getElementById('login-firms');
+/* ── ADMIN ── */
+const ADMIN_PW = 'VLI-HSG-2025';
+
+function openAdminModal() {
+  const m = document.getElementById('admin-modal-wrap');
+  if (m) m.classList.add('open');
+  const pi = document.getElementById('admin-pw-input');
+  if (pi) pi.value = '';
+  const pe = document.getElementById('admin-pw-error');
+  if (pe) pe.style.display = 'none';
+}
+
+function closeAdminModal(e) {
+  if (!e || e.target === document.getElementById('admin-modal-wrap')) {
+    const m = document.getElementById('admin-modal-wrap');
+    if (m) m.classList.remove('open');
+  }
+}
+
+async function doAdminLogin() {
+  const pw = document.getElementById('admin-pw-input').value;
+  if (pw !== ADMIN_PW) {
+    document.getElementById('admin-pw-error').style.display = 'block';
+    return;
+  }
+  document.getElementById('admin-modal-wrap').classList.remove('open');
+  currentFirm = '__admin__';
+  currentSector = '';
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('main-app').style.display = 'block';
+  document.getElementById('nav-firm-name').textContent = 'Administrator';
+  const adminTab = document.getElementById('admin-nav-tab');
+  if (adminTab) adminTab.style.display = 'inline-flex';
+  showPage('admin');
+  renderAdminView();
+}
+
+async function renderAdminView() {
+  const c = document.getElementById('admin-content');
+  if (!c) return;
+  c.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text3);font-size:14px">Alle Firmendaten werden geladen …</div>';
   try {
-    const data = await apiGet('/api/firms');
+    const data = await apiGet('/api/admin');
     const firms = data.firms || [];
-    if (!firms.length) { wrap.style.display = 'none'; return; }
-    wrap.style.display = 'block';
-    container.innerHTML = firms.map(f =>
-      `<span class="firm-chip" onclick="quickLogin('${f.replace(/'/g,"\\'")}')"><span class="firm-chip-dot"></span>${f}</span>`
-    ).join('');
-  } catch { wrap.style.display = 'none'; }
+    if (!firms.length) { c.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text3)">Noch keine Firmendaten vorhanden.</div>'; return; }
+
+    const bySector = {};
+    firms.forEach(f => {
+      const s = f.sector || 'Nicht angegeben';
+      if (!bySector[s]) bySector[s] = [];
+      bySector[s].push(f);
+    });
+
+    const allApps = firms.flatMap(f => f.portfolio || []);
+    const avgIndex = allApps.length ? Math.round((allApps.reduce((s,a)=>s+a.total,0)/allApps.length - 1)/4*100) : 0;
+    const critCount = allApps.filter(a => a.total >= 4).length;
+
+    const summaryHtml = `<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:28px">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--border-radius-lg);padding:16px 20px;flex:1;min-width:130px;box-shadow:var(--shadow)">
+        <div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Firmen total</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:32px;line-height:1">${firms.length}</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--border-radius-lg);padding:16px 20px;flex:1;min-width:130px;box-shadow:var(--shadow)">
+        <div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Applikationen</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:32px;line-height:1">${allApps.length}</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--border-radius-lg);padding:16px 20px;flex:1;min-width:130px;box-shadow:var(--shadow)">
+        <div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Ø Lock-in Index</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:32px;line-height:1">${avgIndex}</div>
+        <div style="font-size:11px;color:var(--text3)">von 100</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--border-radius-lg);padding:16px 20px;flex:1;min-width:130px;box-shadow:var(--shadow)">
+        <div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Kritische Apps</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:32px;line-height:1;color:#6e1a1a">${critCount}</div>
+        <div style="font-size:11px;color:var(--text3)">Score ≥ 4.0</div>
+      </div>
+    </div>`;
+
+    const sectorEntries = Object.entries(bySector).map(([s, sf]) => {
+      const apps = sf.flatMap(f => f.portfolio || []);
+      const avg = apps.length ? apps.reduce((sum,a)=>sum+a.total,0)/apps.length : 1;
+      return { sector:s, firms:sf, apps, avg, idx: Math.round((avg-1)/4*100) };
+    }).sort((a,b) => b.idx - a.idx);
+
+    const barW = 380;
+    const bars = sectorEntries.map((e, i) => {
+      const risk = getRisk(e.avg);
+      const bw = Math.max((e.idx/100)*barW, 3);
+      const y = 20 + i*36;
+      const label = e.sector.length > 30 ? e.sector.slice(0,29)+'…' : e.sector;
+      return `
+        <text x="-4" y="${y+14}" font-size="11" font-family="DM Sans,sans-serif" fill="#6b6560" text-anchor="end" dominant-baseline="middle">${label}</text>
+        <rect x="0" y="${y+2}" width="${bw}" height="22" rx="3" fill="${risk.bg}" stroke="${risk.col}" stroke-width="1"/>
+        <text x="${bw+8}" y="${y+14}" font-size="11" font-family="DM Sans,sans-serif" fill="${risk.col}" font-weight="500" dominant-baseline="middle">${e.idx} · ${e.firms.length}F, ${e.apps.length}A</text>`;
+    }).join('');
+
+    const chartH = sectorEntries.length * 36 + 40;
+    const chartHtml = `<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--border-radius-lg);padding:20px 24px;box-shadow:var(--shadow);margin-bottom:28px;overflow-x:auto">
+      <div style="font-size:13px;font-weight:500;margin-bottom:4px">Ø Lock-in Index nach Branche</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:16px">Wert = Index 0–100 · F = Firmen · A = Applikationen</div>
+      <svg viewBox="-220 0 700 ${chartH}" style="width:100%;max-width:700px;display:block">${bars}</svg>
+    </div>`;
+
+    const sectorsHtml = sectorEntries.map(e => {
+      const risk = getRisk(e.avg);
+      const firmRows = e.firms.map(f => {
+        const fa = f.portfolio || [];
+        const favg = fa.length ? fa.reduce((s,a)=>s+a.total,0)/fa.length : 1;
+        const fr = getRisk(favg);
+        const fidx = Math.round((favg-1)/4*100);
+        return `<div class="firm-row">
+          <div><div class="firm-row-name">${f.firm}</div><div class="firm-row-meta">${fa.length} Applikation${fa.length!==1?'en':''}</div></div>
+          <div style="text-align:right">
+            <div style="font-family:'DM Serif Display',serif;font-size:20px;color:${fr.col}">${favg.toFixed(2)}</div>
+            <div style="font-size:11px;color:${fr.col};background:${fr.bg};border:1px solid ${fr.border};border-radius:99px;padding:1px 7px;display:inline-block;margin-top:2px">${fr.label}</div>
+          </div>
+        </div>`;
+      }).join('');
+      return `<div class="industry-section">
+        <div class="industry-section-head">
+          <div><div class="industry-name">${e.sector}</div><div class="industry-meta">${e.firms.length} ${e.firms.length===1?'Firma':'Firmen'} · ${e.apps.length} Apps</div></div>
+          <div style="text-align:right">
+            <div class="industry-score" style="color:${risk.col}">${e.idx}</div>
+            <div style="font-size:11px;color:${risk.col};background:${risk.bg};border:1px solid ${risk.border};border-radius:99px;padding:2px 8px;display:inline-block;margin-top:4px">Ø ${risk.label}</div>
+          </div>
+        </div>
+        ${firmRows}
+      </div>`;
+    }).join('');
+
+    c.innerHTML = summaryHtml + chartHtml + sectorsHtml;
+  } catch(e) {
+    c.innerHTML = `<div style="padding:40px;text-align:center;color:var(--text3)">Fehler: ${e.message}</div>`;
+  }
 }
 
-function quickLogin(name) {
-  document.getElementById('firm-input').value = name;
-  document.getElementById('login-btn').disabled = false;
-  doLogin();
-}
+async function renderFirmChips() { /* firm list hidden for privacy */ }
+function quickLogin() {}
 
 renderFirmChips();
+
 
 function getRisk(score) {
   if (score < 2) return RISK[0];
