@@ -1977,6 +1977,41 @@ async function renderPortfolio() {
   }
   clearBtn.style.display = 'inline-flex';
 
+  // ── Gesamtscores berechnen ──────────────────────────────────────
+  const kernApps    = portfolio.filter(a => a.type === 'kern');
+  const supportApps = portfolio.filter(a => a.type === 'support');
+
+  const avgAll     = portfolio.length     ? portfolio.reduce((s,a)=>s+a.total,0)/portfolio.length     : null;
+  const avgKern    = kernApps.length      ? kernApps.reduce((s,a)=>s+a.total,0)/kernApps.length       : null;
+  const avgSupport = supportApps.length   ? supportApps.reduce((s,a)=>s+a.total,0)/supportApps.length : null;
+
+  function scoreCard(label, avg, count, sublabel) {
+    if (avg === null) return `
+      <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:16px 20px;flex:1;min-width:160px;opacity:.45">
+        <div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">${label}</div>
+        <div style="font-size:11px;color:var(--text3)">Keine Einträge</div>
+      </div>`;
+    const risk = getRisk(avg);
+    const idx  = Math.round((avg - 1) / 4 * 100);
+    return `
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--border-radius-lg);padding:16px 20px;flex:1;min-width:160px;box-shadow:var(--shadow)">
+        <div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">${label}</div>
+        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px">
+          <div style="font-family:'DM Serif Display',serif;font-size:32px;line-height:1;letter-spacing:-.02em;color:${risk.col}">${avg.toFixed(2)}</div>
+          <div style="font-size:12px;color:${risk.col};font-weight:500;padding:2px 8px;border-radius:99px;background:${risk.bg};border:1px solid ${risk.border}">${risk.label}</div>
+        </div>
+        <div style="font-size:12px;color:var(--text3)">Lock-in Index: ${idx} / 100</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">${count} ${sublabel}</div>
+      </div>`;
+  }
+
+  const summaryHtml = `
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px">
+      ${scoreCard('Firmen-Gesamtscore', avgAll, portfolio.length, portfolio.length === 1 ? 'Applikation' : 'Applikationen')}
+      ${scoreCard('Kernapplikationen', avgKern, kernApps.length, kernApps.length === 1 ? 'Applikation' : 'Applikationen')}
+      ${scoreCard('Supportapplikationen', avgSupport, supportApps.length, supportApps.length === 1 ? 'Applikation' : 'Applikationen')}
+    </div>`;
+
   const tilesHtml = portfolio.map(app => {
     const risk = getRisk(app.total);
     const miniBars = DIMS_DEF.map((d, i) => {
@@ -2012,6 +2047,7 @@ async function renderPortfolio() {
   const radarHtml = portfolio.length > 0 ? renderRadar() : '';
 
   c.innerHTML = `
+    ${summaryHtml}
     <div class="app-grid">${tilesHtml}</div>
     ${radarHtml}`;
 }
