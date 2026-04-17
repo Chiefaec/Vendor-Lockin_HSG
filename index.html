@@ -1028,332 +1028,439 @@ body {
 <script>
 const DIMS_DEF = [
   {
-    id:'tech', label:'Technologische Abhängigkeit', short:'Technologie',
+    id:'tech', label:'Technisch', short:'Technisch',
     color:'#4a6b8a', colorLight:'#e8eff5',
-    wKern:.20, wSupport:.15,
-    hint:'Wie tief ist die Applikation technisch mit dem Anbieter verflochten?',
+    wKern:.27, wSupport:.27,
+    hint:'T-01 bis T-06 · CVL-Framework & CIO-Interviews · Gewicht 27 %',
     qs:[
       {
-        q:'Wie viele der genutzten Funktionen basieren auf proprietären Diensten oder APIs des Anbieters, die kein anderer Anbieter so anbietet?',
-        hint:'Denke an spezifische Cloud-Dienste, SDKs oder Plattformfeatures, die nur bei diesem Anbieter existieren.',
-        opts:['Fast keine — wir nutzen ausschliesslich offene Standards','Wenige — ein oder zwei Einzelfunktionen sind herstellergebunden','Einige — mehrere Bereiche hängen vom Anbieter ab','Viele — ein Grossteil der Funktionen ist herstellergebunden','Nahezu alles — die Applikation ist tief in die Plattform eingebaut']
+        q:'In welchem Ausmaß setzt die Applikation auf proprietäre Cloud-Services (z. B. serverlose Funktionen, Managed Databases, ML-Plattformen), für die es keine standardisierten Alternativen gibt?',
+        hint:'T-01 · CVL-Framework. Je tiefer proprietäre Services in der Architektur verankert sind, desto höher der technische Lock-in. Beispiele: AWS Lambda, Azure Cognitive Services, GCP BigQuery-spezifische Features.',
+        opts:['0 — Keine proprietären Services, ausschliesslich offene Standards genutzt','1 — Vereinzelt proprietäre Dienste, leicht durch Alternativen ersetzbar','2 — Mehrere proprietäre Services, Umbau mit vertretbarem Aufwand möglich','3 — Wesentliche Architekturanteile herstellergebunden, Wechsel sehr aufwendig','4 — Durchgängig proprietäre Architektur, Wechsel erfordert vollständigen Neuaufbau']
       },
       {
-        q:'Wie stark ist die Applikation von proprietären Entwicklungsframeworks, SDKs oder Laufzeitumgebungen des Anbieters abhängig?',
-        hint:'Läuft die App nur auf einer bestimmten Cloud-Plattform oder benötigt sie herstellerspezifische Laufzeitkomponenten?',
-        opts:['Nicht abhängig — läuft auf jedem Standard-Stack','Kaum — nur eine kleine Randkomponente ist gebunden','Teilweise — einzelne Module setzen auf proprietären Komponenten auf','Stark — der Kern der Applikation setzt darauf auf','Vollständig — ein Betrieb ohne Anbieter-Stack ist nicht möglich']
+        q:'Wie hoch ist der Anteil proprietärer APIs gegenüber offenen, standardisierten Schnittstellen (REST/OpenAPI) — und wie tief sind Umsysteme über diese Kopplungen integriert?',
+        hint:'T-02 · CVL-Framework. Proprietäre APIs müssen bei einem Wechsel in allen Umsystemen neu implementiert werden. Offene Standards wie OpenAPI, OIDC oder S3-kompatible Schnittstellen reduzieren dieses Risiko erheblich.',
+        opts:['0 — Ausschliesslich offene APIs und Standards, keine proprietären Kopplungen','1 — Vereinzelte proprietäre Schnittstellen, Umsysteme leicht anpassbar','2 — Mehrere proprietäre APIs, strukturierte Migrationsvorbereitung erforderlich','3 — Überwiegend proprietäre Schnittstellen, Integrationslandschaft wesentlich betroffen','4 — Nahezu vollständig proprietäres API-Ökosystem, Wechsel erschüttert Architektur']
       },
       {
-        q:'Wie hoch schätzt du den technischen Aufwand ein, die Applikation zu einem anderen Anbieter mit ähnlichem Funktionsumfang zu migrieren?',
-        hint:'Gemeint ist der reine Entwicklungs- und Architekturaufwand, unabhängig von Kosten oder Organisation.',
-        opts:['Sehr gering — wenige Stunden Konfiguration','Gering — einige Tage Entwicklungsarbeit','Mittel — mehrere Wochen mit Architekturanpassungen','Hoch — mehrere Monate, grundlegender Umbau nötig','Sehr hoch — mehrjähriges Transformationsprojekt notwendig']
+        q:'Ist die Applikation containerisiert und nach cloud-agnostischen Prinzipien (z. B. Kubernetes, Open Container Initiative) entwickelt, sodass sie auf einer anderen Infrastruktur betrieben werden könnte?',
+        hint:'T-03 · Empirisch (CIO-Interviews). Containerisierung ist laut CIO-Interviews die wirkungsvollste technische Gegenmassnahme. Energieversorger: kurzfristiger Lock-in-Index 100 durch 95 % Azure-Bindung ohne Containerisierung.',
+        opts:['0 — Vollständig containerisiert, plattformunabhängig deploybar','1 — Überwiegend containerisiert, einzelne anbietergebundene Komponenten','2 — Teilweise containerisiert, Kernapplikation noch nicht vollständig portabel','3 — Kaum containerisiert, Deployment stark an Anbieter-Infrastruktur gebunden','4 — Keine Containerisierung, Betrieb ausschliesslich über herstellerspezifische Plattform']
       },
       {
-        q:'Werden in der Applikation aktiv offene Standards (z. B. OpenAPI, OIDC, S3-kompatibel) genutzt, oder setzt sie überwiegend auf herstellerspezifische Mechanismen?',
-        hint:'Je mehr offene Standards genutzt werden, desto geringer die technische Bindung.',
-        opts:['Durchgehend offene Standards — sehr portable Architektur','Überwiegend offen — mit einzelnen proprietären Ausnahmen','Gemischt — etwa halb/halb offen und proprietär','Überwiegend proprietär — offene Standards kaum genutzt','Ausschliesslich proprietär — kein nennenswerter Einsatz offener Standards']
+        q:'Ist die Systemarchitektur so dokumentiert und gestaltet, dass ein Anbieterwechsel technisch planbar und innerhalb eines definierten Zeithorizonts umsetzbar wäre?',
+        hint:'T-04 · Empirisch (CIO-Interviews). Architekturflexibilität ist laut Lebensmittelhandel-CIO die wirkungsvollste Massnahme. Ohne Dokumentation ist ein Wechsel blind und riskant.',
+        opts:['0 — Architektur vollständig dokumentiert, Wechselpfade definiert und realistisch','1 — Weitgehend dokumentiert, Wechsel mit überschaubarem Aufwand planbar','2 — Teils dokumentiert, Wechselhorizont grob abschätzbar','3 — Lückhafte Dokumentation, Wechselplanung mit erheblichem Aufwand verbunden','4 — Keine Architekturdokumentation, Wechsel kaum planbar']
       },
       {
-        q:'Ist die Applikation containerisiert oder so deploybar, dass sie unabhängig von der Infrastruktur eines einzelnen Anbieters betrieben werden könnte?',
-        hint:'Z. B. Docker/Kubernetes auf beliebiger Infrastruktur versus nur als Managed Service des Anbieters nutzbar.',
-        opts:['Vollständig containerisiert und plattformunabhängig deploybar','Grösstenteils — kleinere anbieterabhängige Teile vorhanden','Teilweise — Kernanwendung portabel, Peripherie nicht','Kaum — Deployment ist stark an Anbieterdienste geknüpft','Nicht möglich — Betrieb ausschliesslich über Anbieterplattform']
+        q:'Sind Sicherheits-Patches, Zertifikate und Cyber-Security-Mechanismen direkt an den aktuellen Anbieter gebunden und nicht ohne weiteres auf eine andere Plattform übertragbar?',
+        hint:'T-05 · Elicit-Literaturrecherche. Anbietergebundene Patch-Management-Systeme und Security-Toolchains schaffen technische Abhängigkeiten, die bei einem Wechsel oft unterschätzt werden.',
+        opts:['0 — Sicherheitsmechanismen vollständig plattformunabhängig','1 — Überwiegend unabhängig, einzelne anbietergebundene Sicherheitskomponenten','2 — Teils gebunden, Sicherheitsarchitektur würde bei Wechsel Anpassungen erfordern','3 — Stark gebunden, Security-Toolchain weitgehend herstellerspezifisch','4 — Vollständig anbietergebunden, Sicherheitsarchitektur nicht portierbar']
+      },
+      {
+        q:'Steht ein maschinenlesbarer Export aller Daten in einem Standardformat (gemäss EU Data Act Art. 26) jederzeit vollständig zur Verfügung — inklusive Metadaten, Konfigurationen und Audit-Logs?',
+        hint:'T-11 · Empirisch (CIO-Interviews). Fehlende Datenportabilität ist oft der härteste technische Lock-in. EU Data Act Art. 26 verpflichtet Anbieter zu maschinenlesbaren Exporten in offenen Formaten.',
+        opts:['0 — Vollständiger Self-Service-Export in offenen Formaten jederzeit verfügbar','1 — Export mit geringem Aufwand realisierbar, kleinere Metadaten-Lücken behebbar','2 — Partieller Export möglich, relevante Datenbereiche schwer extrahierbar','3 — Export nur mit Anbieterunterstützung und erheblichem Zeitaufwand','4 — Kein vollständiger Export möglich, faktische Datenimmobilisierung']
       }
     ],
     qsSupport:[
       {
-        q:'Könnte diese Applikation ohne grösseren technischen Aufwand durch ein alternatives Tool ersetzt werden?',
-        hint:'Denke an SaaS-Alternativen am Markt — gibt es vergleichbare Lösungen, die ähnliche Funktionen bieten?',
-        opts:['Ja — viele gleichwertige Alternativen verfügbar','Weitgehend — mit geringem Aufwand ersetzbar','Teilweise — einige Anpassungen nötig','Eher nicht — kaum funktionsgleiche Alternativen','Nein — keine vergleichbare Lösung am Markt']
+        q:'Kann diese Applikation ohne umfassenden Architekturumbau durch eine funktionsgleiche Alternative ersetzt werden?',
+        hint:'T-01/T-04 · Bei Supporttools ist die Kernfrage: Ist das Tool standardisiert genug für einen raschen Wechsel?',
+        opts:['0 — Vollständig standardisiert, Wechsel innerhalb von Wochen realistisch','1 — Überwiegend portabel, einzelne Anpassungen erforderlich','2 — Moderater Aufwand, proprietäre Elemente müssen migriert werden','3 — Erheblicher Umbauaufwand, proprietäre Architektur dominiert','4 — Kein realistischer Wechsel ohne vollständigen Neuaufbau']
       },
       {
-        q:'Nutzt die Applikation überwiegend Standard-Schnittstellen und offene Formate, oder ist sie tief in proprietäre Anbieterstrukturen eingebunden?',
-        hint:'Standardlösungen mit offenen APIs sind einfacher auszutauschen als tief integrierte Speziallösungen.',
-        opts:['Ausschliesslich offene Standards und Formate','Überwiegend offen — einzelne proprietäre Elemente','Gemischt','Überwiegend proprietär','Vollständig proprietär eingebunden']
+        q:'Stehen alle Daten der Applikation in einem exportierbaren Standardformat vollständig zur Verfügung?',
+        hint:'T-11 · EU Data Act. Bei Supporttools genügen oft CSV/Excel-Exporte — entscheidend ist, dass keine Daten beim Wechsel verloren gehen.',
+        opts:['0 — Vollständiger Self-Service-Export jederzeit möglich','1 — Export mit geringem Aufwand, kleinere Lücken behebbar','2 — Teilweise exportierbar, nicht alle Datenbereiche abgedeckt','3 — Export erfordert Anbieterunterstützung, erheblicher Zeitaufwand','4 — Kein vollständiger Datenexport möglich']
       },
       {
-        q:'Wie hoch ist der Einführungsaufwand für eine alternative Lösung — technisch und für die Benutzer?',
-        hint:'Bei Supportapplikationen ist der Change-Aufwand für Mitarbeitende oft die grösste Hürde.',
-        opts:['Minimal — schnell eingeführt und erlernt','Gering — wenige Tage Einarbeitung','Mittel — einige Wochen Umstellung','Hoch — intensive Einführungsphase nötig','Sehr hoch — tiefe Spezialisierung kaum transferierbar']
+        q:'Sind die Schnittstellen dieser Applikation zu anderen Systemen standardisiert und bei einem Wechsel ohne grösseren Aufwand neu konfigurierbar?',
+        hint:'T-02 · Offene APIs wie REST/OpenAPI ermöglichen eine deutlich schnellere Ablösung als proprietäre Konnektoren.',
+        opts:['0 — Ausschliesslich offene, dokumentierte APIs — problemlos übertragbar','1 — Überwiegend offen, einzelne proprietäre Schnittstellen anpassbar','2 — Gemischt — moderater Integrationsaufwand beim Wechsel','3 — Überwiegend proprietäre Kopplungen, Umbau aufwendig','4 — Vollständig proprietär vernetzt, Schnittstellenlandschaft müsste neu aufgebaut werden']
       }
     ]
   },
   {
-    id:'data', label:'Daten- & Integrationsabhängigkeit', short:'Daten',
-    color:'#4a7c5a', colorLight:'#e8f2ec',
-    wKern:.20, wSupport:.15,
-    hint:'Wie leicht lassen sich Daten und Schnittstellen aus dem System herauslösen?',
-    qs:[
-      {
-        q:'Wie tief sind die Daten dieser Applikation in unternehmenskritische Prozesse eingebunden, z. B. Produktion, Vertrieb oder Kundendaten?',
-        hint:'Je zentraler die Daten, desto höher das Risiko und der Aufwand bei einem Wechsel.',
-        opts:['Periphere Hilfsdaten ohne direkte Prozessrelevanz','Unterstützende Daten — wichtig, aber nicht betriebskritisch','Relevant — Ausfall würde Prozesse spürbar beeinträchtigen','Wichtig — viele Kernprozesse hängen direkt daran','Hochkritisch — Ausfall würde das Geschäft sofort und direkt treffen']
-      },
-      {
-        q:'Könntest du jederzeit alle Daten vollständig exportieren — inklusive Historien, Metadaten, Berechtigungsstrukturen und Konfigurationen?',
-        hint:'Nicht nur die Kerndaten, sondern wirklich alles, was für einen Neustart bei einem anderen Anbieter nötig wäre.',
-        opts:['Ja — vollständiger Self-Service-Export jederzeit möglich','Weitgehend — kleiner Aufwand oder kurze Abstimmung nötig','Teilweise — einige Datenbereiche sind schwer oder nicht exportierbar','Schwierig — Export braucht Anbieterunterstützung und dauert Wochen','Nicht möglich — kein vollständiger Datenexport vorgesehen oder erlaubt']
-      },
-      {
-        q:'Werden die Daten in proprietären Formaten oder Datenmodellen gespeichert, die ohne Anbieter-Tools schwer lesbar oder konvertierbar wären?',
-        hint:'Offene Formate wie CSV, JSON oder SQL sind portabel; proprietäre Binärformate oder Schemata nicht.',
-        opts:['Ausschliesslich offene, standardisierte Formate','Überwiegend offen — einzelne proprietäre Felder vorhanden','Gemischt — etwa halb offen, halb proprietär','Überwiegend proprietär — Konvertierung aufwändig','Vollständig proprietär — ohne Anbieter-Tools nicht lesbar']
-      },
-      {
-        q:'Wie stark sind andere Systeme über anbieterabhängige Schnittstellen (proprietäre APIs, Webhooks, Konnektoren) mit dieser Applikation verbunden?',
-        hint:'Bei einem Wechsel müssten alle diese Schnittstellen neu gebaut oder umgeschrieben werden.',
-        opts:['Keine solchen Schnittstellen — ausschliesslich offene APIs genutzt','Eine oder zwei anbieterabhängige Schnittstellen, leicht ersetzbar','Mehrere — mittlerer Umbauaufwand bei einem Wechsel','Viele — ein Wechsel würde zahlreiche verbundene Systeme betreffen','Nahezu alles ist über proprietäre Schnittstellen verbunden']
-      },
-      {
-        q:'Falls du heute die Applikation wechseln müsstest: Wie gut ist die gesamte Integrationslogik — Datenflüsse, Mappings, Schnittstellen — dokumentiert?',
-        hint:'Gut dokumentierte Integrationen lassen sich auf einem neuen System schneller und zuverlässiger nachbauen.',
-        opts:['Vollständig dokumentiert — jede Schnittstelle klar beschrieben','Grösstenteils dokumentiert — kleinere Lücken vorhanden','Teils dokumentiert — relevante Teile, aber nicht alles erfasst','Kaum dokumentiert — Wissen liegt nur bei einzelnen Schlüsselpersonen','Nicht dokumentiert — niemand weiss genau, was wie verbunden ist']
-      },
-      {
-        q:'Gibt es Einschränkungen oder Zusatzkosten, wenn du grosse Datenmengen exportieren oder zu einem anderen Anbieter übertragen möchtest?',
-        hint:'Sogenannte Egress-Kosten oder API-Limits können einen Wechsel erheblich verteuern oder faktisch verhindern.',
-        opts:['Keine — Datenabzug und Transfer sind kostenlos und unbegrenzt','Geringe Kosten — im Budget vernachlässigbar','Messbare Kosten — im Budget noch handhabbar','Hohe Kosten — würden einen Wechsel deutlich verteuern','Sehr hohe Kosten oder technische Sperren — faktische Wechselblockade']
-      }
-    ],
-    qsSupport:[
-      {
-        q:'Können die Daten aus dieser Applikation einfach exportiert werden, z. B. als CSV oder Excel?',
-        hint:'Bei Supporttools wie HR, Reisekosten oder Ticketing ist ein einfacher Datenexport entscheidend.',
-        opts:['Ja — vollständiger Self-Service-Export jederzeit möglich','Weitgehend — mit geringem Aufwand exportierbar','Teilweise — nicht alle Daten sind exportierbar','Schwierig — Export nur mit Anbieterunterstützung','Nicht möglich — kein Datenexport vorgesehen']
-      },
-      {
-        q:'Wie viele andere Systeme sind direkt mit dieser Applikation verbunden und müssten bei einem Wechsel angepasst werden?',
-        hint:'Auch Supporttools können über Schnittstellen zu HR-Systemen, Buchhaltung oder Verzeichnisdiensten verbunden sein.',
-        opts:['Keine Verbindungen — vollständig isolierte Lösung','Eine oder zwei, leicht anpassbar','Einige — überschaubarer Aufwand','Mehrere — nennenswerter Integrationsaufwand','Viele — ein Wechsel würde viele Systeme betreffen']
-      },
-      {
-        q:'Werden Daten in Standard-Formaten gespeichert, oder ist ein Anbieter-Tool für den Zugriff zwingend nötig?',
-        hint:'Offene Formate erlauben den Zugriff auf Daten unabhängig vom Anbieter.',
-        opts:['Ausschliesslich offene Standardformate','Überwiegend offen','Gemischt','Überwiegend proprietär','Ohne Anbieter-Tool nicht lesbar']
-      }
-    ]
-  },
-  {
-    id:'contract', label:'Vertraglich-kommerzielle Abhängigkeit', short:'Vertrag',
+    id:'econ', label:'Wirtschaftlich', short:'Wirtschaftlich',
     color:'#c4614a', colorLight:'#f5ebe8',
-    wKern:.10, wSupport:.20,
-    hint:'Wie stark erschweren Vertrag und Preismodell einen Anbieterwechsel?',
+    wKern:.27, wSupport:.27,
+    hint:'W-01 bis W-05 · CVL-Framework & CIO-Interviews · Gewicht 27 %',
     qs:[
       {
-        q:'Wie lang sind die Vertragslaufzeiten, und wie restriktiv sind Kündigungsfristen oder automatische Verlängerungsklauseln?',
-        hint:'Kurzfristige Verträge mit flexiblen Laufzeiten reduzieren die kommerzielle Abhängigkeit erheblich.',
-        opts:['Monatlich kündbar — maximale Flexibilität','Jährlicher Vertrag mit normaler Frist','Mehrjährig, aber mit klar definierten Exit-Optionen','Mehrjährig mit langen Fristen und kaum Ausstiegsmöglichkeiten','Sehr langfristig gebunden — Kündigung praktisch nicht möglich']
+        q:'Sind die Total Cost of Change (TCO Migration) vollständig quantifiziert — also Migrations-, Parallel- und Opportunitätskosten eines Anbieterwechsels belastbar dokumentiert?',
+        hint:'W-01 · CVL-Framework. Versicherung & Lebensmittel: Wirtschaftlich gleichwertig mit Technisch. Ohne quantifizierte Wechselkosten fehlt die Entscheidungsgrundlage für Lock-in-Management.',
+        opts:['0 — TCO Migration vollständig dokumentiert, aktuelle Kostenschätzung vorhanden','1 — Kosten grob abgeschätzt, wichtigste Posten quantifiziert','2 — Partiell quantifiziert, wesentliche Kostentreiber noch unbekannt','3 — Keine belastbare Kostenschätzung, Wechselaufwand nicht quantifiziert','4 — Wechselkosten unbekannt, wirtschaftliche Auswirkung nicht beurteilbar']
       },
       {
-        q:'Entstehen beim Wechsel zu einem anderen Anbieter nennenswerte direkte Kosten, z. B. für Datentransfer, Vertragsauflösung oder Transformationsleistungen?',
-        hint:'Exit-Kosten umfassen alles, was der Anbieter oder Dritte beim Verlassen der Plattform in Rechnung stellen.',
-        opts:['Keine — Wechsel ist vollständig kostenfrei möglich','Geringe Kosten — im Rahmen, kaum Einfluss auf Entscheidung','Spürbare Kosten — erhöhen den Aufwand merklich','Hohe Kosten — stellen eine wirtschaftliche Hürde für den Wechsel dar','Sehr hohe Kosten — faktisch abschreckend, Wechsel kaum wirtschaftlich darstellbar']
+        q:'Sind Egress-Kosten, Datenausgabe-Gebühren und allfällige Transferkosten bekannt und vertraglich transparent geregelt?',
+        hint:'W-02 · CVL-Framework. Egress-Kosten sind ein klassisches wirtschaftliches Lock-in-Instrument. Energieversorger-Interview: Nur die Androhung eines Wechsels hält Preise stabil — Drohkulisse setzt Kenntnis der Kosten voraus.',
+        opts:['0 — Egress-Kosten bekannt, vertraglich begrenzt und wirtschaftlich tragbar','1 — Kosten bekannt, vertragliche Begrenzung teilweise vorhanden','2 — Kosten bekannt, aber nicht vertraglich begrenzt — wirtschaftliches Risiko','3 — Kosten nur grob bekannt, keine vertragliche Begrenzung','4 — Egress-Kosten unbekannt, faktische wirtschaftliche Wechselblockade']
       },
       {
-        q:'Ist die Preisstruktur des Anbieters transparent und bei wachsendem Nutzungsvolumen gut vorhersehbar?',
-        hint:'Undurchsichtige Preismodelle oder starke Kostensteigerungen bei Skalierung erzeugen versteckte Abhängigkeiten.',
-        opts:['Vollständig transparent — stabile und vorhersehbare Skalierung','Weitgehend nachvollziehbar — kleinere Unklarheiten vorhanden','Teils unklar — Kostensteigerungen bei Wachstum schwer planbar','Intransparent — Überraschungen bei der Rechnung sind keine Seltenheit','Kaum nachvollziehbar — massive Skalierungskostenrisiken vorhanden']
+        q:'Verfügt das Unternehmen über ausreichendes Vertragsvolumen und eine glaubwürdige Wechselalternative, um gegenüber dem Anbieter eine belastbare Verhandlungsposition einzunehmen?',
+        hint:'W-03 · Empirisch (CIO-Interviews). Energieversorger: Nur die Androhung eines Wechsels hält Preise stabil. Verhandlungsmacht setzt voraus, dass Alternativen bekannt und technisch realisierbar sind.',
+        opts:['0 — Starke Verhandlungsposition, glaubwürdige Alternativen vorhanden und kommuniziert','1 — Gute Position, Alternativen evaluiert und kommunizierbar','2 — Eingeschränkte Position, Alternativen bekannt aber nicht belastbar','3 — Schwache Position, keine glaubwürdigen Alternativen verfügbar','4 — Keine Verhandlungsmacht, vollständige Abhängigkeit vom Anbieter']
       },
       {
-        q:'Sind die Leistungen dieser Applikation mit anderen Produkten des Anbieters gebündelt, sodass ein Einzelwechsel wirtschaftlich unattraktiv wäre?',
-        hint:'Z. B. Rabatte auf ein Gesamtpaket, das man verliert, wenn man nur einen einzelnen Dienst wechselt.',
-        opts:['Nicht gebündelt — eigenständig und ohne Verluste wechselbar','Leichte Bündelung — geringe Auswirkungen bei einem Wechsel','Moderate Bündelung — Wechsel kostet spürbar mehr','Starke Bündelung — Wechsel würde erhebliche Mehrkosten verursachen','Vollständig integriert — Einzelwechsel faktisch nicht wirtschaftlich darstellbar']
+        q:'Wurde das Preisrisiko bei Vertragsverlängerung bewertet — insbesondere das Risiko einseitiger Preiserhöhungen und deren Auswirkung auf die Gesamtkosten?',
+        hint:'W-04 · Elicit-Literaturrecherche. M365-Beispiel (CIO-Interviews): Wechselkosten dominieren. Preiseskalationsrisiken ohne vertragliche Schutzmechanismen sind ein unterschätzter Lock-in-Treiber.',
+        opts:['0 — Preisrisiko bewertet, vertragliche Eskalationsobergrenzen vereinbart','1 — Risiko bewertet, Obergrenzen teilweise verhandelt','2 — Risiko grob abgeschätzt, keine vertraglichen Schutzmechanismen','3 — Preisrisiko nicht bewertet, Verlängerungskonditionen unklar','4 — Kein Risikobewusstsein, einseitige Preiserhöhungen faktisch nicht einschränkbar']
       },
       {
-        q:'Enthält der Vertrag klare Regelungen für den Fall eines Anbieterwechsels — z. B. Datenexport-Unterstützung, Transitfristen oder Portabilitätsverpflichtungen?',
-        hint:'Gute Verträge regeln explizit, was der Anbieter beim Exit konkret leisten muss.',
-        opts:['Ja — vollständig und konkret geregelt mit klaren Leistungspflichten','Grösstenteils geregelt — kleinere Lücken vorhanden','Teilweise — vage Formulierungen ohne klare Pflichten und Fristen','Kaum — Exit-Unterstützung nicht oder nur ansatzweise erwähnt','Nicht geregelt — keinerlei vertragliche Exit-Unterstützung vorgesehen']
-      },
-      {
-        q:'Setzt der Vertrag voraus, dass bestimmte exklusive Dienste oder Lizenzprodukte des Anbieters weiter genutzt werden müssen?',
-        hint:'Z. B. Pflichtbindung an Add-ons, Zertifizierungen oder Exklusivpartner des Anbieters.',
-        opts:['Keine Verpflichtung — vollständige Wahlfreiheit bei Zusatzdiensten','Einzelne optionale Empfehlungen — keine echte Pflicht','Moderate Pflichten — einige Dienste müssen zwingend genutzt werden','Starke Pflichten — viele Leistungen sind herstellergebunden vorgeschrieben','Vollständige Exklusivbindung — keinerlei Spielraum für Alternativen']
+        q:'Ist das Verbot von Switching-Gebühren gemäss EU Data Act Art. 23–26 (Umsetzung ab Januar 2027) bereits vertraglich antizipiert oder für die nächste Vertragsverlängerung vorbereitet?',
+        hint:'W-05 · Empirisch (CIO-Interviews). Der EU Data Act verbietet ab 2027 Switching-Gebühren für Cloud-Dienste. Unternehmen, die diese Regelung heute vertraglich verankern, stärken ihre Verhandlungsposition erheblich.',
+        opts:['0 — Klausel vertraglich verankert, Switching-Freiheit rechtlich gesichert','1 — Klausel vorbereitet, Verhandlung für nächste Verlängerung geplant','2 — Thema intern diskutiert, Umsetzung noch ausstehend','3 — EU Data Act Implikationen noch nicht analysiert','4 — Keine Berücksichtigung, Switching-Gebühren uneingeschränkt möglich']
       }
     ],
     qsSupport:[
       {
-        q:'Wie flexibel kann diese Applikation gekündigt oder gewechselt werden — wie lang ist die Mindestlaufzeit?',
-        hint:'Supporttools sollten idealerweise kurze Laufzeiten haben, da sie weniger betriebskritisch sind.',
-        opts:['Monatlich kündbar — sehr flexibel','Jährlich — akzeptabel','Zwei Jahre — noch überschaubar','Drei Jahre oder mehr — eingeschränkte Flexibilität','Sehr langfristig — kaum Ausstiegsmöglichkeit']
+        q:'Sind die Gesamtkosten eines Anbieterwechsels — inkl. Migration, Schulung und Produktivitätsverlust — bekannt und im Verhältnis zum Nutzen bewertet?',
+        hint:'W-01 · Für Supporttools ist die Kosten-Nutzen-Relation bei einem Wechsel oft der entscheidende Faktor.',
+        opts:['0 — Kosten bekannt, Wechsel wirtschaftlich jederzeit darstellbar','1 — Kosten grob abgeschätzt, wirtschaftlich vertretbar','2 — Kosten teils unbekannt, Auswirkung schwer planbar','3 — Wechselkosten nicht quantifiziert, erhebliches wirtschaftliches Risiko','4 — Wechselkosten unbekannt und vermutlich prohibitiv']
       },
       {
-        q:'Ist die monatliche oder jährliche Gebühr für diese Applikation im Verhältnis zum Nutzen transparent und verhältnismässig?',
-        hint:'Für Supporttools ist ein klares Preis-Leistungs-Verhältnis wichtig, da Wechsel einfacher möglich sein sollten.',
-        opts:['Sehr transparent und verhältnismässig','Weitgehend nachvollziehbar','Teils unklar — Kosten schwer kalkulierbar','Eher intransparent — Zusatzkosten häufig','Sehr intransparent — Kosten kaum planbar']
+        q:'Sind Kündigungsfristen, automatische Verlängerungsklauseln und Egress-Kosten vertraglich transparent und für das Unternehmen vorteilhaft geregelt?',
+        hint:'W-02/W-04 · Auch bei Supporttools können ungünstige Vertragskonditionen einen wirtschaftlichen Lock-in erzeugen.',
+        opts:['0 — Vollständig transparent, kurze Fristen, keine Egress-Kosten','1 — Weitgehend fair, einzelne ungünstige Klauseln','2 — Gemischt, moderate wirtschaftliche Wechselhürden','3 — Restriktiv, hohe Egress- oder Auflösungskosten','4 — Stark einschränkend, wirtschaftlicher Wechsel faktisch nicht darstellbar']
       },
       {
-        q:'Sind Rabatte oder Vergünstigungen an die Nutzung anderer Produkte desselben Anbieters geknüpft, die einen Wechsel verteuern würden?',
-        hint:'Paketrabatte erhöhen die Wechselkosten, auch wenn das Tool selbst leicht ersetzbar wäre.',
-        opts:['Nein — keine Bündelung','Leichte Bündelung — geringe Auswirkung','Moderate Bündelung','Starke Bündelung — Wechsel deutlich teurer','Vollständige Pakete — Einzelwechsel wirtschaftlich nicht sinnvoll']
+        q:'Verfügt das Unternehmen über eine glaubwürdige Verhandlungsposition und kennt konkrete Alternativangebote für diese Applikation?',
+        hint:'W-03 · Konkurrenzangebote sind auch bei Supporttools wichtig, um Preiserhöhungen bei Verlängerung zu begrenzen.',
+        opts:['0 — Starke Position, Alternativangebote vorhanden und kommuniziert','1 — Gute Position, Alternativen bekannt','2 — Eingeschränkt, Alternativen vorhanden aber nicht belastbar evaluiert','3 — Schwache Position, kaum Alternativen bekannt','4 — Keine Verhandlungsmacht, vollständige Abhängigkeit']
       }
     ]
   },
   {
-    id:'ops', label:'Operative & organisatorische Abhängigkeit', short:'Operativ',
+    id:'org', label:'Organisatorisch', short:'Organisatorisch',
     color:'#6b5a8a', colorLight:'#f0ecf7',
-    wKern:.15, wSupport:.15,
-    hint:'Wie stark hängt der laufende Betrieb von Anbieterwissen ab?',
+    wKern:.17, wSupport:.17,
+    hint:'O-01 bis O-04 · CVL-Framework & CIO-Interviews · Gewicht 17 %',
     qs:[
       {
-        q:'Wie viel betriebsrelevantes Wissen über diese Applikation liegt ausschliesslich beim Anbieter oder bei spezialisierten Partnern — und nicht intern?',
-        hint:'Gemeint ist Wissen, das für Betrieb, Fehlersuche oder Weiterentwicklung täglich benötigt wird.',
-        opts:['Fast alles intern bekannt — wir sind vollständig self-sufficient','Überwiegend intern — gelegentliche Rückfragen beim Anbieter','Gemischt — kritische Teile sind nur beim Anbieter bekannt','Grossteil des Wissens liegt beim Anbieter oder bei Partnern','Nahezu vollständige Wissensabhängigkeit — ohne Anbieter läuft nichts']
+        q:'Verfügt das Unternehmen intern über die Kompetenzen und Kapazitäten (Cloud-Architektur, Migration, Projektmanagement), um einen Anbieterwechsel eigenständig zu planen und umzusetzen?',
+        hint:'O-01 · CVL-Framework. Lebensmittel-Interview: Kompetenzaufbau für Anbieterwechsel als zentrale Massnahme. Fehlende interne Kapazität ist oft die kritischste, aber am wenigsten sichtbare Wechselbarriere.',
+        opts:['0 — Vollständige interne Cloud-Kompetenz und Migrationskapazität vorhanden','1 — Kompetenz überwiegend vorhanden, kleinerer externer Support erforderlich','2 — Kompetenz teilweise vorhanden, erhebliche externe Ressourcen nötig','3 — Geringe interne Kompetenz, Wechsel nur mit grossem externem Einsatz machbar','4 — Keine interne Wechselkompetenz, vollständige Abhängigkeit von externen Dienstleistern']
       },
       {
-        q:'Wie gut ist das Betriebswissen rund um diese Applikation intern dokumentiert und auf mehrere Personen verteilt?',
-        hint:'Hängt alles Wissen an einer einzigen Person im Team, ist das ein kritisches organisatorisches Risiko.',
-        opts:['Vollständig dokumentiert und breit im Team verankert','Gut dokumentiert — wenige Wissenslücken vorhanden','Teils dokumentiert — Abhängigkeit von einzelnen Schlüsselpersonen','Kaum dokumentiert — Wissen liegt bei einer oder zwei Personen','Nicht dokumentiert — starkes Personenabhängigkeitsrisiko besteht']
+        q:'Sind die durch diese Applikation unterstützten Geschäftsprozesse vollständig und strukturiert dokumentiert (z. B. BPMN 2.0 oder gleichwertig), sodass ein Wechsel ohne Prozesswissensverlust möglich wäre?',
+        hint:'O-02 · Empirisch (CIO-Interviews). Versicherung-Interview: BPMN 2.0 Prozessdokumentation erleichtert Wechsel massgeblich. Ohne Prozessdokumentation kann kein alternativer Anbieter konfiguriert werden.',
+        opts:['0 — Vollständige Prozessdokumentation (BPMN 2.0 o. gleichwertig) vorhanden','1 — Weitgehend dokumentiert, kleinere Lücken ohne strategische Relevanz','2 — Teils dokumentiert, relevante Prozesse nicht vollständig erfasst','3 — Lückhafte Dokumentation, kritisches Prozesswissen nur bei Einzelpersonen','4 — Keine strukturierte Prozessdokumentation, Wissen nicht transferierbar']
       },
       {
-        q:'Wie sehr ist das Unternehmen für Betrieb, Support oder Weiterentwicklung auf Managed Services oder Professional Services des Anbieters angewiesen?',
-        hint:'Je mehr externe Ressourcen des Anbieters für den laufenden Betrieb nötig sind, desto höher die Abhängigkeit.',
-        opts:['Nicht angewiesen — vollständig intern betrieben und gewartet','Kaum — nur bei grossen Updates oder Upgrades nötig','Teils — regelmässige Anbieterunterstützung ist eingeplant','Stark — Betrieb ohne Anbieter kaum vorstellbar','Vollständig — wir haben keine eigene Betriebskompetenz für diese Applikation']
+        q:'Ist der Schulungs- und Einarbeitungsaufwand für eine alternative Lösung für alle betroffenen Rollen konkret abgeschätzt und in der Wechselplanung berücksichtigt?',
+        hint:'O-03 · CVL-Framework. IT-Dienstleister-Interview: Menschen müssen mitgenommen werden — Wechselprojekte scheitern oft an fehlender Akzeptanz, nicht an Technik. Schulungsaufwand muss budgetiert sein.',
+        opts:['0 — Schulungsaufwand vollständig abgeschätzt, in Planung und Budget integriert','1 — Aufwand grob abgeschätzt, Budget für Schulung eingeplant','2 — Aufwand teilweise bekannt, Budget nicht vollständig gesichert','3 — Schulungsaufwand nicht abgeschätzt, erhebliche Ungewissheit','4 — Kein Bewusstsein für Schulungsbedarf, Change-Risiko nicht bewertet']
       },
       {
-        q:'Wie hoch wäre der Schulungsaufwand für die Mitarbeitenden, wenn die Applikation durch eine Alternative ersetzt würde?',
-        hint:'Stark spezialisierte Oberflächen oder Workflows, die nirgendwo sonst vorkommen, erhöhen den Change-Aufwand erheblich.',
-        opts:['Minimal — Benutzeroberfläche ist Standard oder schnell erlernbar','Gering — wenige Tage Einarbeitung je Person ausreichend','Mittel — mehrere Wochen strukturiertes Training notwendig','Hoch — monatelange Umstellung und intensive Begleitung erforderlich','Sehr hoch — tiefe Spezialisierung, die kaum auf andere Systeme transferierbar ist']
-      },
-      {
-        q:'Hat das Unternehmen intern genug Ressourcen und Kompetenz, um einen Anbieterwechsel oder Re-Platforming eigenständig zu planen und durchzuführen?',
-        hint:'Fehlendes internes Know-how ist eine oft unterschätzte, aber kritische Wechselbarriere.',
-        opts:['Ja — wir haben die Kompetenz und Kapazität vollständig intern','Weitgehend — kleinere externe Unterstützung wäre nötig','Teilweise — erhebliche externe Hilfe wäre erforderlich','Kaum — ein Wechsel wäre nur mit grossen externen Ressourcen machbar','Nicht vorhanden — vollständige externe Abhängigkeit für jeden Wechsel']
+        q:'Verfügt das Unternehmen über ausreichende Change-Management-Kapazität, um einen Anbieterwechsel organisatorisch zu begleiten — inkl. Kommunikation, Stakeholder-Management und Nutzerakzeptanz?',
+        hint:'O-04 · Elicit-Literaturrecherche. IT-Dienstleister-Interview: Soft-Strategie empfohlen — Akzeptanzprobleme sind häufigster Grund für das Scheitern von Migrationsprojekten.',
+        opts:['0 — Change-Management-Kapazität vollständig vorhanden, Migrationserfahrung nachgewiesen','1 — Kapazität überwiegend vorhanden, bei Bedarf ergänzbar','2 — Eingeschränkte Kapazität, externes Change-Management würde benötigt','3 — Kaum Change-Kapazität, Akzeptanzrisiko erheblich','4 — Keine Change-Management-Ressourcen, Scheitern an Akzeptanz realistisch']
       }
     ],
     qsSupport:[
       {
-        q:'Wie schnell könnten neue Mitarbeitende mit einem alternativen Tool produktiv werden?',
-        hint:'Bei Standardsoftware im Supportbereich ist die Einarbeitung meistens kürzer als bei Kernsystemen.',
-        opts:['Sehr schnell — innerhalb von Stunden oder einem Tag','Schnell — wenige Tage','Mittel — ein bis zwei Wochen','Eher langsam — mehrere Wochen nötig','Langsam — intensive Schulung unbedingt nötig']
+        q:'Verfügt das Team über ausreichend interne Kompetenz, um diese Applikation zu administrieren und bei Bedarf zu migrieren?',
+        hint:'O-01 · Übermässige Abhängigkeit von externem Know-how ist auch bei Supporttools ein häufig unterschätztes Risiko.',
+        opts:['0 — Vollständig intern beherrschbar, keine externe Unterstützung nötig','1 — Überwiegend intern, gelegentliche Unterstützung ausreichend','2 — Teils extern abhängig, regelmässige externe Hilfe nötig','3 — Stark extern abhängig, kaum internes Know-how','4 — Keine interne Kompetenz vorhanden']
       },
       {
-        q:'Wie stark ist der Betrieb dieser Applikation von spezifischem Anbieterwissen oder externen Spezialisten abhängig?',
-        hint:'Supporttools sollten möglichst ohne externe Unterstützung betrieben werden können.',
-        opts:['Nicht abhängig — vollständig intern betrieben','Kaum — gelegentliche Rückfragen','Teils abhängig — regelmässige externe Hilfe','Stark abhängig — kaum ohne Anbieter betreibbar','Vollständig — kein internes Betriebswissen vorhanden']
+        q:'Wie hoch wäre der Change-Aufwand (Schulung, Kommunikation, Nutzerakzeptanz) bei einem Wechsel auf eine alternative Lösung?',
+        hint:'O-03/O-04 · Auch bei Supporttools scheitern Wechsel häufig an Akzeptanz statt an Technik.',
+        opts:['0 — Minimaler Change-Aufwand, Lösung schnell akzeptierbar','1 — Geringer Aufwand, wenige Tage Einarbeitung pro Person','2 — Moderater Aufwand, mehrere Wochen Schulung und Kommunikation','3 — Hoher Aufwand, intensive Begleitung über Monate','4 — Sehr hoher Aufwand, erheblicher Widerstand zu erwarten']
       },
       {
-        q:'Wäre die Benutzerakzeptanz bei einem Wechsel zu einer alternativen Lösung voraussichtlich hoch?',
-        hint:'Hohe Nutzerzufriedenheit mit dem aktuellen Tool kann einen Wechsel erschweren, auch wenn er technisch einfach wäre.',
-        opts:['Ja — Mitarbeitende würden Alternativen problemlos akzeptieren','Weitgehend — leichte Überzeugungsarbeit nötig','Teils — gemischte Erwartungen im Team','Eher nicht — starke Präferenz für das aktuelle Tool','Nein — erheblicher interner Widerstand zu erwarten']
+        q:'Sind die Geschäftsprozesse dieser Applikation so dokumentiert, dass eine neue Lösung ohne Informationsverlust konfiguriert werden könnte?',
+        hint:'O-02 · Prozessdokumentation ist auch bei Supporttools entscheidend für einen reibungslosen Wechsel.',
+        opts:['0 — Vollständig dokumentiert, Wechsel prozessseitig jederzeit möglich','1 — Weitgehend dokumentiert, kleinere Lücken','2 — Teils dokumentiert, relevante Lücken vorhanden','3 — Kaum dokumentiert, erhebliches Prozesswissensrisiko','4 — Nicht dokumentiert, Prozesswissen nicht transferierbar']
       }
     ]
   },
   {
-    id:'exit', label:'Migrations- & Exit-Fähigkeit', short:'Exit',
+    id:'legal', label:'Rechtlich', short:'Rechtlich',
+    color:'#2d8a7a', colorLight:'#e1f5ee',
+    wKern:.16, wSupport:.16,
+    hint:'R-01 bis R-09 · CVL-Framework & CIO-Interviews · Gewicht 16 %',
+    qs:[
+      {
+        q:'Ist der Datenspeicherort vertraglich auf Schweizer und/oder EU-Rechenzentren beschränkt — und wird die Einhaltung dieser Vorgabe durch den Anbieter regelmässig nachgewiesen?',
+        hint:'R-01 · CVL-Framework. Schweizer Spezifik: nDSG stellt höhere Anforderungen als die DSGVO. Datenspeicherort ist besonders im Finanz-, Versicherungs- und Gesundheitssektor kritisch.',
+        opts:['0 — Vertraglich auf CH/EU begrenzt, regelmässiger Nachweis vorhanden','1 — Vertraglich geregelt, Nachweis punktuell vorhanden','2 — Teilweise geregelt, Lücken in Nachweis oder Abdeckung','3 — Speicherort nicht vollständig vertraglich gesichert','4 — Keine vertragliche Einschränkung des Datenspeicherorts']
+      },
+      {
+        q:'Wurde die Exposition gegenüber dem US Cloud Act bewertet — und sind vertraglich oder technisch Schutzmassnahmen für den Fall eines US-Behördenzugriffs auf Unternehmensdaten vorhanden?',
+        hint:'R-02 · Empirisch (CIO-Interviews). Energieversorger: Rechtliches Risiko als gering eingestuft (EU-Rechenzentren, US Cloud Act noch nie angewendet). Dennoch: Risikobewusstsein und dokumentierte Bewertung sind Pflicht.',
+        opts:['0 — US Cloud Act Exposition bewertet, vertragliche/technische Schutzmassnahmen vorhanden','1 — Bewertet, punktuelle Schutzmassnahmen implementiert','2 — Bewertet, Schutzmassnahmen teilweise vorhanden','3 — Risiko bekannt, aber nicht systematisch bewertet','4 — US Cloud Act Exposition nicht analysiert, kein Risikobewusstsein']
+      },
+      {
+        q:'Liegt eine aktuelle Datenschutz-Folgeabschätzung (DSFA) vor, und ist die nDSG/DSGVO-Konformität des Anbieters vertraglich und technisch nachgewiesen?',
+        hint:'R-03 · CVL-Framework. IT-Dienstleister-Interview: Datenschutz und Compliance-Einhaltung kritisch. Eine DSFA ist Pflicht bei der Verarbeitung besonders schützenswerter Daten.',
+        opts:['0 — DSFA aktuell vorhanden, nDSG/DSGVO-Konformität vollständig nachgewiesen','1 — DSFA vorhanden, Konformität weitgehend nachgewiesen','2 — DSFA teils vorhanden, Lücken in Nachweis oder Aktualität','3 — Keine aktuelle DSFA, Konformität nicht vollständig nachgewiesen','4 — Keine DSFA, Datenschutzkonformität nicht beurteilbar']
+      },
+      {
+        q:'Verfügt der Anbieter über eine aktuelle BSI C5 Typ B-Zertifizierung (oder vergleichbar: ISO 27001, SOC 2 Typ II), und ist diese im Vertrag als Anforderung verankert?',
+        hint:'R-07 · Elicit-Literaturrecherche. IT-Dienstleister: BSI C5 als Prüfinstrument. Typ B (Bericht über tatsächliche Durchführung) ist deutlich aussagekräftiger als Typ A (Designbeschreibung).',
+        opts:['0 — BSI C5 Typ B (oder gleichwertig) vorhanden und vertraglich vorgeschrieben','1 — Zertifizierung vorhanden, vertraglich nicht explizit gefordert','2 — Gleichwertige Zertifizierung vorhanden (z. B. ISO 27001)','3 — Nur Selbstauskunft des Anbieters, keine unabhängige Zertifizierung','4 — Keine relevante Sicherheitszertifizierung vorhanden']
+      },
+      {
+        q:'Sind die Switching-Rechte gemäss EU Data Act (Art. 23–26) — insbesondere das Recht auf kostenfreie Datenübertragung und Portierungsunterstützung — im aktuellen Vertrag oder für die nächste Verlängerung berücksichtigt?',
+        hint:'R-08 · Empirisch (CIO-Interviews). EU Data Act tritt schrittweise in Kraft. Switching-Gebühren werden ab Januar 2027 verboten. Vertraglich frühzeitig antizipieren.',
+        opts:['0 — Switching-Rechte nach EU Data Act vollständig vertraglich verankert','1 — Teilweise verankert, für Verlängerung vollständig geplant','2 — Thema bekannt, vertraglich noch nicht umgesetzt','3 — EU Data Act Implikationen noch nicht analysiert','4 — Keine Berücksichtigung, Switching-Gebühren uneingeschränkt möglich']
+      },
+      {
+        q:'Enthält der Vertrag eine explizite Exit-Klausel mit Portabilitätsgarantie, definierten Transitfristen und Unterstützungsleistungen — angepasst an den Schweizer Rechtskontext (nDSG vs. EU Data Act)?',
+        hint:'R-09 · Forschungslücke. Schweizer Spezifik: nDSG vs. EU Data Act-Lücke muss vertraglich kompensiert werden. Exit-Klauseln sind in Schweizer Verträgen oft unvollständig oder fehlen ganz.',
+        opts:['0 — Umfassende Exit-Klausel vorhanden, CH-spezifisch angepasst','1 — Exit-Klausel vorhanden, Portabilitätsgarantie und Transitfristen geregelt','2 — Ansatzweise geregelt, wesentliche Aspekte fehlen','3 — Kaum vertragliche Exit-Regelungen vorhanden','4 — Keine Exit-Klausel, keinerlei vertragliche Portabilitätsgarantie']
+      }
+    ],
+    qsSupport:[
+      {
+        q:'Ist der Datenspeicherort vertraglich geregelt und die nDSG/DSGVO-Konformität für alle in dieser Applikation verarbeiteten Daten nachgewiesen?',
+        hint:'R-01/R-03 · Auch Supporttools wie HR, Bewerbermanagement oder Lernplattformen verarbeiten oft sensible Personendaten.',
+        opts:['0 — Vollständig geregelt und nachgewiesen','1 — Weitgehend geregelt, kleinere Lücken','2 — Teils geregelt, Lücken vorhanden','3 — Nicht vollständig geregelt, Datenschutzrisiken erkennbar','4 — Nicht geregelt, erhebliches Datenschutzrisiko']
+      },
+      {
+        q:'Enthält der Vertrag faire Schutzmechanismen bei einseitigen Anbieteränderungen — z. B. Sonderkündigungsrechte bei Preiserhöhung oder Serviceeinstellung?',
+        hint:'R-08/R-09 · Faire Vertragsklauseln sind auch bei Supporttools der wichtigste rechtliche Schutz gegen wirtschaftlichen Lock-in.',
+        opts:['0 — Umfassende Schutzmechanismen vorhanden','1 — Wichtigste Schutzrechte vertraglich gesichert','2 — Teilweise gesichert, einige Risiken ohne Absicherung','3 — Wenige Schutzmechanismen, anbieterfreundliche Klauseln überwiegen','4 — Keine Schutzmechanismen, vollständige Anbieterfreiheit']
+      },
+      {
+        q:'Sind compliance-relevante Anforderungen (IT-Sicherheitsrichtlinien, ISO-Zertifizierungen, Branchenanforderungen) bei einem Wechsel ohne grösseren Mehraufwand erfüllbar?',
+        hint:'R-07 · Compliance-Anforderungen können auch bei Supporttools einen Wechsel erheblich verteuern.',
+        opts:['0 — Compliance bei Wechsel problemlos erfüllbar','1 — Geringer Zusatzaufwand, planbar','2 — Moderate Anforderungen, strukturierte Planung nötig','3 — Erhebliche Anforderungen, Genehmigungsprozesse erforderlich','4 — Compliance bei Wechsel kaum sicherstellbar']
+      }
+    ]
+  },
+  {
+    id:'strat', label:'Strategisch', short:'Strategisch',
     color:'#b8823a', colorLight:'#f5eed8',
-    wKern:.20, wSupport:.20,
-    hint:'Wie vorbereitet ist das Unternehmen auf einen Anbieterwechsel?',
+    wKern:.09, wSupport:.09,
+    hint:'S-01 bis S-04 · CVL-Framework & CIO-Interviews · Gewicht 9 %',
     qs:[
       {
-        q:'Existiert ein dokumentierter Exit-Plan für diese Applikation — also eine Beschreibung, wie ein geordneter Anbieterwechsel konkret ablaufen würde?',
-        hint:'Nicht ein vages Konzept, sondern ein abgestimmter Plan mit Schritten, Verantwortlichen und Zeitrahmen.',
-        opts:['Ja — vollständig ausgearbeitet, abgestimmt und aktuell gehalten','Grösstenteils — Entwurf vorhanden, noch nicht vollständig ausgearbeitet','Ansatzweise — einzelne Überlegungen, kein strukturierter Plan','Kaum — Wechselszenario wurde selten bis nie ernsthaft durchdacht','Nicht vorhanden — kein Exit-Plan für diese Applikation existiert']
+        q:'Wurde bei Vertragsabschluss eine Exitstrategie dokumentiert, die definiert, unter welchen Bedingungen und auf welchem Weg ein Anbieterwechsel eingeleitet würde?',
+        hint:'S-01 · CVL-Framework. Alle vier CIO-Interviews betonen: Exitstrategie muss bei Vertragsabschluss definiert sein. Versicherung: Strategie ist flexibles Papier — wichtig ist die Umsetzbarkeit.',
+        opts:['0 — Exitstrategie dokumentiert, regelmässig aktualisiert und getestet','1 — Exitstrategie vorhanden, Aktualisierungsrhythmus definiert','2 — Exitstrategie existiert, aber nicht vollständig ausgearbeitet','3 — Keine dokumentierte Exitstrategie, Überlegungen nur informell','4 — Keine Exitstrategie, Lock-in wird nicht aktiv gesteuert']
       },
       {
-        q:'Wurde ein Exit, Re-Hosting, Datenexport oder eine Testmigration dieser Applikation jemals praktisch durchgeführt oder zumindest simuliert?',
-        hint:'Ungetestete Exit-Pläne sind theoretisch — tatsächliche Tests geben dem Plan erst Praxisrelevanz.',
-        opts:['Ja — erfolgreich durchgeführt und vollständig validiert','Teil-Tests oder Proofs of Concept wurden bereits gemacht','Nur auf Papier beschrieben — nicht praktisch getestet','Nie ernsthaft angedacht oder initiiert','Nein — keinerlei Test oder Simulation je stattgefunden']
+        q:'Hat das Unternehmen eine Dual- oder Multi-Cloud-Strategie definiert oder konkret vorbereitet, um kritische Workloads nicht vollständig von einem einzigen Anbieter abhängig zu machen?',
+        hint:'S-02 · Empirisch (CIO-Interviews). Energieversorger: Ziel ist Verlagerung auf mindestens zwei Anbieter. Lebensmittel: 3+2 Jahre Vorlauf für Multi-Cloud. Dual-Cloud erfordert langen Planungshorizont.',
+        opts:['0 — Dual/Multi-Cloud-Strategie implementiert, kritische Workloads verteilt','1 — Strategie definiert, Umsetzung begonnen','2 — Strategie vorbereitet, Umsetzung noch ausstehend','3 — Strategie diskutiert, keine konkreten Schritte eingeleitet','4 — Keine Multi-Cloud-Überlegungen, vollständige Single-Cloud-Abhängigkeit']
       },
       {
-        q:'Wie vollständig ist die technische Dokumentation dieser Applikation — inklusive Architekturübersicht, Systemabhängigkeiten und Betriebshandbuch?',
-        hint:'Ohne vollständige Dokumentation ist ein Wechsel blind, langsam und fehleranfällig.',
-        opts:['Vollständig und aktuell — alles ist klar beschrieben','Weitgehend vorhanden — kleinere, nicht kritische Lücken','Teils vorhanden — wichtige Bereiche und Komponenten fehlen','Lückenhaft — Dokumentation veraltet oder unvollständig','Praktisch keine Dokumentation vorhanden']
+        q:'Hat der Verwaltungsrat oder die Geschäftsleitung spezifische Key Risk Indicators (KRI) für Cloud-Abhängigkeit definiert, und wird der Lock-in-Status regelmässig auf Führungsebene berichtet?',
+        hint:'S-03 · Elicit-Literaturrecherche. VR fragt zunehmend nach Business Resilience und Lock-in (CIO-Interviews). KRIs auf Board-Ebene signalisieren strategische Verankerung und schaffen Management-Accountability.',
+        opts:['0 — KRI definiert, regelmässiges Board-Reporting etabliert','1 — KRI definiert, Reporting vorhanden aber nicht standardisiert','2 — Thema auf Board-Ebene bekannt, keine formellen KRI','3 — Kein Board-Reporting, Thema nur auf operativer Ebene bekannt','4 — Lock-in strategisch nicht auf Radar, keine KRI oder Reporting']
       },
       {
-        q:'Gibt es konkrete Alternativanbieter oder definierte Migrationspfade, die das Unternehmen im Wechselfall tatsächlich einschlagen könnte?',
-        hint:'Nicht eine generelle Vorstellung, sondern eine echte Shortlist mit evaluierten und bewerteten Optionen.',
-        opts:['Ja — Alternativanbieter evaluiert und Migrationspfade detailliert definiert','Teilweise — Anbieter bekannt, Pfad noch nicht ausgearbeitet','Vage Vorstellung — keine systematische Marktanalyse oder Evaluation','Kaum — nur allgemeines, nicht vertieftes Marktwissen vorhanden','Nein — keine bekannten Alternativen oder Migrationspfade identifiziert']
-      },
-      {
-        q:'Könnten Daten, Konfigurationen und Applikationsbestandteile vollständig in einem offenen oder gängigen Format exportiert werden, das ein anderer Anbieter importieren kann?',
-        hint:'Das ist eine der härtesten Lock-in-Fragen: Was passiert technisch, wenn man morgen den Anbieter verlassen muss?',
-        opts:['Ja — vollständiger Export in offenen Standardformaten jederzeit möglich','Grösstenteils — mit kleinen proprietären Restmengen','Teils — ein relevanter Teil der Daten ist nicht portabel exportierbar','Schwierig — vieles bleibt beim Anbieter oder ist nur aufwändig konvertierbar','Nicht möglich — kein nutzbarer oder vollständiger Export vorgesehen']
-      },
-      {
-        q:'Besteht das Risiko, dass beim Wechsel zu einem anderen Anbieter relevante Funktionalität verloren geht, weil kein Wettbewerber denselben Funktionsumfang bietet?',
-        hint:'Wenn der Markt keine funktionsäquivalenten Alternativen hat, ist ein Wechsel zwangsläufig mit Qualitätsverlust verbunden.',
-        opts:['Nein — vergleichbare und bewährte Alternativen am Markt vorhanden','Kaum — kleinere Funktionslücken, die tolerierbar wären','Teilweise — einige Features müssten neu entwickelt oder aufgegeben werden','Stark — wesentliche Funktionen wären bei Alternativen nicht verfügbar','Vollständig — keine Marktlösung bietet annähernd denselben Funktionsumfang']
+        q:'Wird die Vertragsverlängerung dieser Applikation strategisch mit ausreichend Vorlauf geplant — inkl. Evaluation von Alternativen, Verhandlungsstrategie und Entscheidungsvorlage für die Führungsebene?',
+        hint:'S-04 · Empirisch (CIO-Interviews). Lebensmittel: 3+2 Jahre Vorlauf erforderlich. Versicherung: Strategie muss umsetzbar sein. Ohne strategische Planung landet man unreflektiert in der automatischen Verlängerung.',
+        opts:['0 — Verlängerungsplanung mit 3+ Jahren Vorlauf, strukturierter Evaluationsprozess','1 — Planung mit 1–2 Jahren Vorlauf, Alternativevaluation eingeplant','2 — Verlängerung wird geplant, Vorlauf für Alternativevaluation knapp','3 — Verlängerung meist kurzfristig, keine systematische Alternativevaluation','4 — Verlängerungen reaktiv und ohne strategische Vorbereitung']
       }
     ],
     qsSupport:[
       {
-        q:'Gibt es am Markt mehrere vergleichbare Lösungen, die diese Applikation kurzfristig ersetzen könnten?',
-        hint:'Ein breites Marktangebot an Alternativen reduziert das Lock-in-Risiko bei Supporttools erheblich.',
-        opts:['Ja — viele gleichwertige Alternativen bekannt und evaluiert','Weitgehend — einige Alternativen vorhanden','Teils — Alternativen bekannt, aber noch nicht geprüft','Wenige — Marktangebot eingeschränkt','Kaum — keine bekannten funktionsgleichen Alternativen']
+        q:'Ist für diese Applikation eine grundlegende Exitüberlegung vorhanden — bekannt, wie und unter welchen Bedingungen ein Wechsel eingeleitet würde?',
+        hint:'S-01 · Auch bei Supporttools sollte mindestens eine informelle Wechselüberlegung und ein Alternativanbieter bekannt sein.',
+        opts:['0 — Exitüberlegung dokumentiert, Alternativanbieter bekannt','1 — Informell bekannt, was ein Wechsel bedeuten würde','2 — Kaum durchdacht, grundsätzliche Optionen bekannt','3 — Nicht ernsthaft durchdacht','4 — Keine Exitoptionen bekannt oder überdacht']
       },
       {
-        q:'Wie realistisch wäre ein Wechsel dieser Applikation innerhalb von drei bis sechs Monaten, falls nötig?',
-        hint:'Für Supporttools sollte ein Wechsel in einem überschaubaren Zeitrahmen machbar sein.',
-        opts:['Sehr realistisch — innerhalb von Wochen möglich','Gut machbar — drei Monate ausreichend','Möglich — sechs Monate realistisch','Eher schwierig — mehr als sechs Monate nötig','Nicht realistisch — Wechsel würde über ein Jahr dauern']
+        q:'Wird die Vertragsverlängerung rechtzeitig geplant, sodass Alternativangebote evaluiert und die Verhandlungsposition gestärkt werden kann?',
+        hint:'S-04 · Frühzeitige Planung ist auch bei Supporttools der einfachste Weg, kommerziellen Lock-in zu reduzieren.',
+        opts:['0 — Verlängerung mit ausreichend Vorlauf geplant, Alternativen evaluiert','1 — Frühzeitige Planung meist vorhanden','2 — Teils rechtzeitig, teils reaktiv','3 — Verlängerungen meist kurzfristig','4 — Verlängerungen reaktiv ohne Vorbereitung']
       },
       {
-        q:'Könnten bestehende Daten (z. B. Verlauf, Auswertungen, Konfigurationen) bei einem Wechsel vollständig mitgenommen werden?',
-        hint:'Bei Supporttools wie HR oder Ticketing sind historische Daten wichtig, aber oft nicht betriebsblockierend.',
-        opts:['Ja — vollständiger Datenmitnahme möglich','Weitgehend — die meisten Daten sind exportierbar','Teilweise — wichtige Historien fehlen','Schwierig — erheblicher Datenverlust zu erwarten','Nicht möglich — Datenverlust unvermeidlich']
+        q:'Ist das Thema Vendor-Abhängigkeit für diese Applikation im IT-Governance- und Beschaffungsprozess des Unternehmens verankert?',
+        hint:'S-03 · Governance-Strukturen für Vendor-Lock-in reduzieren das Risiko langfristig und strukturell.',
+        opts:['0 — Vollständig in Governance verankert, regelmässiges Reporting','1 — Teilweise verankert, Reporting vorhanden','2 — Im Bewusstsein, keine formellen Prozesse','3 — Kaum verankert, informelle Handhabung','4 — Kein Governance-Prozess vorhanden']
       }
     ]
   },
   {
-    id:'biz', label:'Geschäftskritische Auswirkungsstärke', short:'Business',
+    id:'res', label:'Resilienz', short:'Resilienz',
     color:'#a05070', colorLight:'#f5ecf0',
-    wKern:.15, wSupport:.15,
-    hint:'Wie gross wäre der Schaden bei Ausfall, Preiserhöhung oder Strategiewechsel des Anbieters?',
+    wKern:.04, wSupport:.04,
+    hint:'RE-01 bis RE-03 · CVL-Framework & CIO-Interviews · Gewicht 4 %',
     qs:[
       {
-        q:'Wie gross wäre der geschäftliche Schaden, wenn der Anbieter morgen die Preise verdoppelt, den Dienst einstellt oder seine Strategie grundlegend ändert?',
-        hint:'Denke an direkte Umsatzauswirkungen, Betriebsunterbrechungen und den Aufwand für eine Notfallumstellung.',
-        opts:['Minimal — leicht und schnell durch eine Alternative ersetzbar','Gering — spürbar, aber gut beherrschbar','Mittel — erheblicher Aufwand und vorübergehende Betriebsunterbrechung','Hoch — schwere Betriebsstörung über mehrere Wochen oder Monate','Existenziell — würde das Kerngeschäft massiv und dauerhaft gefährden']
+        q:'Sind Recovery Time Objective (RTO) und Recovery Point Objective (RPO) für einen Ausfall oder eine erzwungene Migration des Cloud-Anbieters definiert, dokumentiert und regelmässig validiert?',
+        hint:'RE-01 · CVL-Framework. Energieversorger-Interview: RTO/RPO für kritische Systeme definiert — Swissgrid-Strafgebühren als direktes Schadensbeispiel. Ohne definierte RTO/RPO ist Business Continuity nicht planbar.',
+        opts:['0 — RTO/RPO für Anbieterausfall definiert, dokumentiert und regelmässig getestet','1 — RTO/RPO definiert, Validierung teils vorhanden','2 — RTO/RPO grob abgeschätzt, nicht formell dokumentiert','3 — RTO/RPO nicht definiert, Business-Continuity-Überlegungen informal','4 — Keine RTO/RPO-Überlegungen für Anbieterausfall vorhanden']
       },
       {
-        q:'Würden Kunden direkt betroffen sein, wenn diese Applikation im Rahmen einer Migration mehrere Wochen eingeschränkt verfügbar wäre?',
-        hint:'Bei kundenseitig sichtbaren Systemen ist die Toleranz für Ausfälle oder Funktionseinschränkungen besonders gering.',
-        opts:['Nein — rein internes System, keinerlei Kundenwirkung','Kaum — Kunden würden Einschränkungen kaum bemerken','Spürbar — einige Kundensegmente wären merklich betroffen','Erheblich — viele Kunden würden starke Einschränkungen erleben','Kritisch — direkte und sofortige Kundenwirkung bei jedem Ausfall']
+        q:'Wurde die technische Failover-Fähigkeit auf einen Alternativanbieter konkret getestet — und ist sichergestellt, dass der Betrieb im Ausfall- oder Wechselfall aufrechterhalten werden kann?',
+        hint:'RE-02 · Empirisch (CIO-Interviews). IT-Dienstleister: Multi-Cloud-Stack als Resilienzarchitektur implementiert. Ein ungetesteter Failover-Plan ist keine Resilienz — er ist eine Hoffnung.',
+        opts:['0 — Failover getestet und validiert, Alternativanbieter betriebsbereit','1 — Failover konzipiert, Teiltest durchgeführt','2 — Failover konzipiert, noch nicht getestet','3 — Kein Failover-Konzept, Alternativanbieter nicht evaluiert','4 — Kein Resilienzkonzept, vollständige Single-Provider-Abhängigkeit']
       },
       {
-        q:'Würde ein erzwungener Anbieterwechsel regulatorische Risiken erzeugen — z. B. in Bezug auf Datenschutz, Compliance-Nachweise oder branchenspezifische Anforderungen?',
-        hint:'In regulierten Branchen kann ein Anbieterwechsel Genehmigungsverfahren auslösen oder bestehende Nachweispflichten gefährden.',
-        opts:['Nein — keinerlei regulatorische Implikationen zu erwarten','Geringe Anforderungen — standardmässig und ohne grossen Aufwand lösbar','Moderate Anforderungen — erfordert Koordination und strukturierten Aufwand','Hohe regulatorische Hürden — erheblicher Compliance-Aufwand und Risiko','Sehr hoch — Wechsel könnte regulatorische Genehmigungen erfordern oder gefährden']
-      },
-      {
-        q:'Wie viele andere interne Systeme und Prozesse sind direkt von dieser Applikation abhängig und müssten bei einem Wechsel ebenfalls angepasst werden?',
-        hint:'Stark vernetzte Systeme ziehen bei einem Wechsel einen langen Rattenschwanz an Folgeänderungen nach sich.',
-        opts:['Keine oder sehr wenige — weitgehend isoliertes, eigenständiges System','Einige — handhabbare Anzahl an Abhängigkeiten','Mehrere — mittlerer Anpassungsaufwand bei verbundenen Systemen','Viele — ein Wechsel würde zahlreiche weitere Systeme betreffen','Sehr viele — weitreichende Auswirkungen auf die gesamte Systemlandschaft']
-      },
-      {
-        q:'Wie gut könnte das Unternehmen einen temporären Teilausfall dieser Applikation während einer Migration organisatorisch verkraften?',
-        hint:'Robuste Notfallprozesse und manuelle Alternativen reduzieren das Risiko; fehlende Alternativen erhöhen ihn erheblich.',
-        opts:['Problemlos — robuste Notfallprozesse und manuelle Alternativen vorhanden','Gut beherrschbar — kurze Unterbrechungen gut tolerierbar','Mittel — erhebliche Belastung, aber mit Aufwand handhabbar','Schwierig — starke Beeinträchtigung des täglichen Geschäfts','Kaum möglich — keinerlei Notfallprozess, sofortige und schwere Betriebsunterbrechung']
+        q:'Existiert ein vollständiger Business-Continuity-Plan (BCP), der einen unerwarteten Wegfall des aktuellen Hyperscalers (Insolvenz, regulatorischer Ausschluss, Übernahme) explizit als Szenario abdeckt?',
+        hint:'RE-03 · Elicit-Literaturrecherche. Versicherung-Interview: Business Resilience ist mit konkretem Budget hinterlegt. Ein BCP ohne Hyperscaler-Ausfallszenario hat eine kritische, oft übersehene Lücke.',
+        opts:['0 — BCP mit Hyperscaler-Ausfallszenario vorhanden, regelmässig geübt und aktualisiert','1 — BCP vorhanden, Hyperscaler-Szenario teilweise abgedeckt','2 — BCP vorhanden, Hyperscaler-Ausfall nicht explizit adressiert','3 — Kein vollständiger BCP für dieses Szenario vorhanden','4 — Kein BCP vorhanden, Hyperscaler-Ausfall nicht als Risiko anerkannt']
       }
     ],
     qsSupport:[
       {
-        q:'Wie stark würde ein mehrtägiger Ausfall dieser Applikation den täglichen Betrieb beeinträchtigen?',
-        hint:'Bei Supporttools sind kurze Ausfälle meistens überbrückbar — manuelle Alternativen sind häufig vorhanden.',
-        opts:['Kaum — manuelle Alternativen problemlos verfügbar','Gering — kurze Unterbrechung ohne grosse Folgen','Spürbar — Produktivität reduziert, aber handhabbar','Deutlich — erhebliche Beeinträchtigung des Arbeitsalltags','Stark — Betrieb stark eingeschränkt ohne diese Applikation']
+        q:'Sind grundlegende Notfallprozesse für den Fall eines mehrtägigen Ausfalls dieser Applikation definiert und den betroffenen Mitarbeitenden bekannt?',
+        hint:'RE-01/RE-03 · Bei Supporttools genügen oft einfache Notfallprozesse — manuelle Alternativen oder Papier-Fallback.',
+        opts:['0 — Notfallprozesse definiert, bekannt und kommuniziert','1 — Notfallprozesse definiert, punktuell kommuniziert','2 — Grundlegende Überlegungen vorhanden, nicht formalisiert','3 — Kaum Notfallplanung, informelle Massnahmen','4 — Keine Notfallplanung vorhanden']
       },
       {
-        q:'Gibt es vertretbare Notfalllösungen oder manuelle Prozesse, die diese Applikation kurzfristig ersetzen könnten?',
-        hint:'Excel, E-Mail oder Papier können bei vielen Supporttools kurzfristig als Notfalllösung dienen.',
-        opts:['Ja — sofort verfügbare und funktionsfähige Notfalllösung','Weitgehend — mit etwas Aufwand umsetzbar','Teils — eingeschränkte manuelle Alternativen','Kaum — sehr schwierig ohne das System','Nein — keinerlei Notfalllösung vorstellbar']
+        q:'Könnten die betroffenen Mitarbeitenden bei einem Ausfall dieser Applikation den Betrieb kurzfristig mit manuellen oder alternativen Methoden aufrechterhalten?',
+        hint:'RE-02 · Manuelle Alternativen wie Excel oder papierbasierte Prozesse sind bei Supporttools oft ausreichend für eine Überbrückung.',
+        opts:['0 — Manuelle Alternativen sofort verfügbar und geübt','1 — Alternativen vorhanden, minimale Produktivitätseinbussen','2 — Eingeschränkte Alternativen, spürbare Betriebsbeeinträchtigung','3 — Kaum Alternativen, erhebliche Einschränkungen','4 — Keine Alternativen, Betrieb bei Ausfall nicht aufrechtzuerhalten']
       },
       {
-        q:'Wie hoch wäre der Gesamtaufwand (Zeit, Kosten, Personal) für einen vollständigen Wechsel dieser Applikation, realistisch geschätzt?',
-        hint:'Bei Supporttools sollte der Wechselaufwand im Verhältnis zum Nutzen stehen.',
-        opts:['Sehr gering — wenige Tage und minimale Kosten','Gering — ein bis zwei Wochen, überschaubare Kosten','Mittel — ein Monat, messbarer Aufwand','Hoch — mehrere Monate, erheblicher Aufwand','Sehr hoch — über sechs Monate, grosse Ressourcen nötig']
+        q:'Ist diese Applikation in die unternehmensweite Business-Continuity-Planung einbezogen — zumindest mit einer Risikoeinschätzung?',
+        hint:'RE-03 · Auch Supporttools sollten mit einer Risikoeinschätzung in die BCP-Übersicht integriert sein.',
+        opts:['0 — In BCP einbezogen, Risikoeinschätzung und Massnahmenplan vorhanden','1 — In BCP erwähnt, Massnahmen teilweise definiert','2 — Risikoeinschätzung vorhanden, BCP-Integration fehlt','3 — Nicht in BCP einbezogen, Risiko bekannt','4 — Vollständig ausserhalb jeder Resilienzplanung']
       }
     ]
   }
 ];
 
+/* ══ RISK LEVELS (Score 0–4, Index 0–100 via ×25) ════════════════════════ */
 const RISK = [
-  { label:'Niedrig',   col:'#2d6e4e', bg:'#e8f5ee', border:'#a8d8bc',
-    measures:['Standardmonitoring etablieren und dokumentieren','Exit-Dokumentation aktuell halten','Jährliche Überprüfung des Lock-in-Scores einplanen'] },
-  { label:'Moderat',   col:'#7a5520', bg:'#f5eed8', border:'#d8c080',
-    measures:['Portabilität der Daten und Architektur konkret prüfen','Vertragsklauseln bei nächster Verlängerung aktiv verbessern','Datenexport und Schnittstellen vollständig dokumentieren','Alternativanbieter beobachten und erste Evaluationen starten'] },
-  { label:'Erhöht',    col:'#8a3520', bg:'#f5ede8', border:'#d8a090',
-    measures:['Konkrete Exit- oder Dual-Vendor-Strategie entwickeln','Proprietäre Komponenten schrittweise reduzieren und ersetzen','Integrationen entflechten und auf offene Standards umstellen','Egress- und Exit-Kosten aktiv nachverhandeln','Testmigration oder Proof of Portability durchführen und dokumentieren'] },
-  { label:'Kritisch',  col:'#6e1a1a', bg:'#f5e8e8', border:'#d89090',
-    measures:['Sofortige Eskalation an das Management','Architektur- und Sourcing-Review einleiten','Verbindlichen Exit-Plan mit Budget, Meilensteinen und Verantwortlichen erstellen','Technische Abhängigkeiten priorisiert und systematisch abbauen','Vertragsnachverhandlung oder Re-Tender-Prozess vorbereiten und einleiten','Risiko-Roadmap mit konkreten Zeitfenstern und Ressourcenzuteilung festlegen'] }
+  { label:'Geringes Risiko',   col:'#2d6e4e', bg:'#e8f5ee', border:'#a8d8bc',
+    measures:['Jährliches Lock-in-Monitoring im IT-Governance-Prozess verankern','Exit-Dokumentation und Alternativliste aktuell halten','Bei Vertragsverlängerung Switching-Rechte gemäss EU Data Act antizipieren'] },
+  { label:'Moderates Risiko',  col:'#7a5520', bg:'#f5eed8', border:'#d8c080',
+    measures:['TCO Migration quantifizieren und für Führungsebene dokumentieren','Portabilitätsstrategie entwickeln, offene Standards und Containerisierung priorisieren','Vertragliche Exit-Klausel und Portabilitätsgarantie bei nächster Verlängerung verhandeln','Alternativanbieter evaluieren und Verhandlungsposition aufbauen'] },
+  { label:'Hohes Risiko',      col:'#8a3520', bg:'#f5ede8', border:'#d8a090',
+    measures:['Dual-Cloud- oder Exit-Strategie mit konkretem Zeithorizont und Budget entwickeln','Containerisierung und cloud-agnostische Architektur als Prioritätsmassnahme einleiten','Egress-Kosten nachverhandeln, EU Data Act Switching-Rechte (Art. 23–26) durchsetzen','BPMN-Prozessdokumentation und interne Migrationskompetenz aufbauen','RTO/RPO für Anbieterausfall definieren, Failover-Test und BCP-Szenario einplanen'] },
+  { label:'Kritisches Risiko', col:'#6e1a1a', bg:'#f5e8e8', border:'#d89090',
+    measures:['Sofortige Eskalation auf Board/VR-Ebene — Lock-in als strategisches Unternehmensrisiko ausweisen','Unabhängiges Architektur- und Sourcing-Review durch externe Spezialisten einleiten','Verbindlichen Exit-Plan mit Budget, Meilensteinen, Verantwortlichen und Board-Genehmigung erstellen','Vertragsnachverhandlung oder Re-Tender-Prozess für alle kritischen Klauseln einleiten','KRI für Cloud-Abhängigkeit definieren und in Board-Reporting verankern (VR-Ebene)','Multi-Cloud-Roadmap mit 3-Jahres-Horizont und dedizierten Ressourcen verabschieden'] }
 ];
+
+/* ══ ACTION CATALOGS ═════════════════════════════════════════════════════ */
+const ACTION_CATALOG = {
+  tech: {
+    label:'Technisch', color:'#4a6b8a',
+    actions:[
+      {minScore:3.5,prio:1,title:'Sofortiger Architektur-Review und Containerisierungs-Roadmap',desc:'Beauftragen Sie einen unabhängigen Architektur-Review zur Identifikation aller proprietären Abhängigkeiten. Leiten Sie parallel eine Containerisierungs-Roadmap ein (T-03/T-04). Energieversorger-Erfahrung zeigt: ohne Containerisierung ist der Lock-in-Index schnell bei 100.'},
+      {minScore:3.0,prio:1,title:'Maschinenlesbaren Datenexport gemäss EU Data Act Art. 26 sicherstellen',desc:'Testen Sie unmittelbar, ob ein vollständiger Export inkl. Metadaten, Konfigurationen und Audit-Logs möglich ist. Dokumentieren Sie Lücken und fordern Sie EU Data Act-konforme Exportfähigkeit vertraglich ein (T-11).'},
+      {minScore:2.5,prio:2,title:'Proprietäre APIs inventarisieren und Migrationsaufwand quantifizieren',desc:'Erstellen Sie ein vollständiges Register aller herstellergebundenen APIs und Schnittstellen. Quantifizieren Sie den Umbauaufwand je Schnittstelle als Entscheidungsgrundlage (T-02).'},
+      {minScore:2.0,prio:2,title:'Cloud-agnostische Architekturprinzipien für Neuentwicklungen vorschreiben',desc:'Verankern Sie in den Architekturprinzipien, dass neue Komponenten ausschliesslich offene Standards (OpenAPI, OIDC, S3-kompatibel) nutzen dürfen (T-02/T-03).'},
+      {minScore:1.5,prio:3,title:'Sicherheitsabhängigkeiten vom Anbieter reduzieren',desc:'Evaluieren Sie, welche Sicherheits- und Patch-Management-Komponenten anbieterunabhängig gestaltet werden können (T-05).'},
+      {minScore:1.0,prio:4,title:'Technologie-Monitoring und jährliche Architektur-Überprüfung',desc:'Überprüfen Sie jährlich, ob neue proprietäre Abhängigkeiten entstanden sind, und halten Sie die Architekturdokumentation aktuell (T-04).'}
+    ]
+  },
+  econ: {
+    label:'Wirtschaftlich', color:'#c4614a',
+    actions:[
+      {minScore:3.5,prio:1,title:'TCO Migration vollständig quantifizieren und für Board dokumentieren',desc:'Beauftragen Sie eine belastbare Wechselkostenanalyse (inkl. Egress, Parallelbetrieb, Schulung). Ohne quantifizierte TCO fehlt die Entscheidungsgrundlage (W-01). Versicherung & Lebensmittel: Wirtschaftlich gleichwertig mit Technisch.'},
+      {minScore:3.0,prio:1,title:'Verhandlungsposition aufbauen: Alternativangebote einholen',desc:'Holen Sie parallel Angebote von Alternativanbietern ein. Energieversorger-Interview: Nur die Androhung eines Wechsels hält Preise stabil (W-03). Ohne glaubwürdige Alternative gibt es keine Verhandlungsmacht.'},
+      {minScore:2.5,prio:2,title:'Egress-Kosten vertraglich begrenzen und EU Data Act-Klausel einbringen',desc:'Fordern Sie vertragliche Obergrenzen für Egress-Kosten und verankern Sie das EU Data Act Switching-Gebührenverbot (ab 2027) bereits heute in der Vertragsstrategie (W-02/W-05).'},
+      {minScore:2.0,prio:2,title:'Preiseskalationsrisiko bei Vertragsverlängerung systematisch bewerten',desc:'Analysieren Sie historische Preisentwicklungen und verhandeln Sie Eskalationsobergrenzen für die nächste Vertragslaufzeit (W-04).'},
+      {minScore:1.5,prio:3,title:'Bündelungsstruktur auf wirtschaftliche Abhängigkeit prüfen',desc:'Analysieren Sie, welche gebündelten Leistungen tatsächlich genutzt werden und ob Einzelvergaben wirtschaftlich vorteilhafter wären (W-03).'},
+      {minScore:1.0,prio:4,title:'Jährlicher Markt- und Preisvergleich',desc:'Vergleichen Sie die Konditionen einmal jährlich mit dem Markt und dokumentieren Sie das Ergebnis als Verhandlungsgrundlage (W-01/W-04).'}
+    ]
+  },
+  org: {
+    label:'Organisatorisch', color:'#6b5a8a',
+    actions:[
+      {minScore:3.5,prio:1,title:'Sofortiges Kompetenzentwicklungsprogramm für Cloud-Migration einleiten',desc:'Identifizieren Sie kritische Wissensabhängigkeiten und starten Sie gezielte Schulungen oder Einstellungen. Lebensmittel-Interview: Kompetenzaufbau ist zentrale Massnahme (O-01).'},
+      {minScore:3.0,prio:1,title:'BPMN-Prozessdokumentation für alle kritischen Applikationsprozesse erstellen',desc:'Erstellen Sie strukturierte Prozessdokumentation (BPMN 2.0 oder gleichwertig). Versicherung-Interview: Prozessdokumentation erleichtert Wechsel massgeblich (O-02).'},
+      {minScore:2.5,prio:2,title:'Schulungsaufwand für Wechselszenario konkret abschätzen und budgetieren',desc:'Quantifizieren Sie den Schulungsbedarf für alle betroffenen Rollen und integrieren Sie ihn in die Migrationsplanung (O-03).'},
+      {minScore:2.0,prio:2,title:'Change-Management-Konzept für Migrationsszenario entwickeln',desc:'Skizzieren Sie, wie Mitarbeitende bei einem Wechsel kommunikativ begleitet würden. IT-Dienstleister: Soft-Strategie ist erfolgskritisch (O-04).'},
+      {minScore:1.5,prio:3,title:'Wissenstransfer mit Anbieter vertraglich absichern',desc:'Vereinbaren Sie Schulungs- und Dokumentationspflichten des Anbieters im Vertrag, um Knowledge Lock-in zu reduzieren (O-01).'},
+      {minScore:1.0,prio:4,title:'Jährliche Kompetenz- und Dokumentations-Review',desc:'Überprüfen Sie jährlich, ob kritisches Betriebswissen intern ausreichend verankert und dokumentiert ist (O-01/O-02).'}
+    ]
+  },
+  legal: {
+    label:'Rechtlich', color:'#2d8a7a',
+    actions:[
+      {minScore:3.5,prio:1,title:'Sofortige Vertrags-Rechtsanalyse durch spezialisierte Kanzlei',desc:'Lassen Sie den Vertrag auf Lock-in-Klauseln, fehlende Exit-Regelungen und US Cloud Act-Risiken prüfen. IT-Dienstleister: BSI C5 als Prüfinstrument (R-01/R-02/R-09).'},
+      {minScore:3.0,prio:1,title:'Exit-Klausel mit Portabilitätsgarantie und CH-Rechtskontext für Verlängerung vorbereiten',desc:'Bestehen Sie bei nächster Verlängerung auf expliziter Exit-Klausel mit Transitfristen, Portabilitätsgarantie und nDSG-konformen Datenmitnahmerechten (R-09).'},
+      {minScore:2.5,prio:2,title:'DSFA aktualisieren und nDSG/DSGVO-Konformität des Anbieters nachweisen',desc:'Stellen Sie sicher, dass eine aktuelle Datenschutz-Folgeabschätzung vorliegt und die Compliance-Nachweise des Anbieters aktuell sind (R-03).'},
+      {minScore:2.0,prio:2,title:'EU Data Act Switching-Rechte (Art. 23–26) vertraglich verankern',desc:'Antizipieren Sie das Switching-Gebührenverbot ab 2027 bereits heute vertraglich. Unternehmen mit frühzeitiger Verankerung haben einen klaren Verhandlungsvorteil (R-08).'},
+      {minScore:1.5,prio:3,title:'US Cloud Act Exposition systematisch bewerten und dokumentieren',desc:'Erstellen Sie eine dokumentierte Risikoeinschätzung zur US Cloud Act-Exposition, auch wenn das Risiko als gering eingestuft wird (R-02).'},
+      {minScore:1.0,prio:4,title:'Jährliche Überprüfung Zertifizierungen und Compliance-Status',desc:'Verifizieren Sie jährlich, dass BSI C5 Typ B (oder gleichwertige Zertifizierung) aktuell und vertraglich gefordert ist (R-07).'}
+    ]
+  },
+  strat: {
+    label:'Strategisch', color:'#b8823a',
+    actions:[
+      {minScore:3.5,prio:1,title:'Exitstrategie als Sofortmassnahme dokumentieren und Board vorlegen',desc:'Erstellen Sie eine umsetzbare Exitstrategie mit Phasen, Alternativanbietern, Zeithorizont und Budget. Alle CIO-Interviews: Exitstrategie muss bei Vertragsabschluss vorliegen (S-01).'},
+      {minScore:3.0,prio:1,title:'Dual-Cloud-Roadmap mit 3-Jahres-Horizont entwickeln',desc:'Leiten Sie eine strategische Planung für Dual- oder Multi-Cloud ein. Energieversorger: Mindestens zwei Anbieter als Ziel. Lebensmittel: 3+2 Jahre Vorlauf einkalkulieren (S-02).'},
+      {minScore:2.5,prio:2,title:'KRI für Cloud-Abhängigkeit definieren und in Board-Reporting integrieren',desc:'Definieren Sie messbare Key Risk Indicators und etablieren Sie regelmässiges Reporting an VR/Board-Ebene (S-03).'},
+      {minScore:2.0,prio:2,title:'Vertragsdekaden-Planung mit 3-Jahres-Vorlauf einführen',desc:'Etablieren Sie einen Prozess, der Vertragsverlängerungen frühzeitig auf die strategische Agenda setzt und Alternativevaluation einschliesst (S-04).'},
+      {minScore:1.0,prio:4,title:'Jährliches strategisches Lock-in-Review auf Führungsebene',desc:'Verankern Sie die Lock-in-Bewertung als festen Traktanden im jährlichen IT-Governance-Zyklus auf Management-Ebene (S-01/S-03).'}
+    ]
+  },
+  res: {
+    label:'Resilienz', color:'#a05070',
+    actions:[
+      {minScore:3.5,prio:1,title:'RTO/RPO für Anbieterausfall sofort definieren und BCP-Lücke schliessen',desc:'Definieren Sie unmittelbar RTO/RPO für das Szenario eines Anbieterausfalls und integrieren Sie es als explizites Szenario in den BCP. Energieversorger: Swissgrid-Strafgebühren als konkretes Schadensbeispiel (RE-01/RE-03).'},
+      {minScore:3.0,prio:2,title:'Failover-Fähigkeit auf Alternativanbieter konzipieren und testen',desc:'Entwickeln Sie ein Failover-Konzept und führen Sie einen Teiltest durch. IT-Dienstleister: Multi-Cloud-Stack als Resilienzarchitektur. Ein ungetesteter Plan ist keine Resilienz (RE-02).'},
+      {minScore:2.0,prio:3,title:'Business-Continuity-Plan um Hyperscaler-Ausfallszenario ergänzen',desc:'Fügen Sie Insolvenz, regulatorischer Ausschluss oder Übernahme als explizite BCP-Szenarien ein. Versicherung: Business Resilience mit konkretem Budget hinterlegt (RE-03).'},
+      {minScore:1.0,prio:4,title:'Jährlicher Resilienz-Test und BCP-Aktualisierung',desc:'Führen Sie einmal jährlich eine Simulation oder einen Teiltest des Failover-Szenarios durch und aktualisieren Sie RTO/RPO-Ziele (RE-01/RE-02).'}
+    ]
+  }
+};
+
+const PRIO_LABELS = { 1: 'Sofort', 2: 'Kurzfristig', 3: 'Mittelfristig', 4: 'Laufend' };
+const PRIO_SECTIONS = [
+  { prio: 1, label: 'Sofortmassnahmen' },
+  { prio: 2, label: 'Kurzfristige Massnahmen (1–3 Monate)' },
+  { prio: 3, label: 'Mittelfristige Massnahmen (3–12 Monate)' },
+  { prio: 4, label: 'Laufende Massnahmen' }
+];
+
+const ACTION_CATALOG_SUPPORT = {
+  tech: {
+    label:'Technisch', color:'#4a6b8a',
+    actions:[
+      {minScore:3.5,prio:1,title:'Alternativanbieter evaluieren und Wechselaufwand abschätzen',desc:'Erstellen Sie eine Shortlist von 2–3 funktionsgleichen Alternativen mit grober Wechselaufwandschätzung. Bei Supporttools sollte ein Wechsel in 1–3 Monaten planbar sein.'},
+      {minScore:2.5,prio:2,title:'Regelmässigen Datenexport als Sicherungsstrategie einrichten',desc:'Richten Sie periodische Datenabzüge (monatlich/quartalsweise) ein, um die Datenverfügbarkeit unabhängig vom Anbieter zu gewährleisten (T-11).'},
+      {minScore:2.0,prio:3,title:'Offene Standards als Beschaffungskriterium verankern',desc:'Schreiben Sie für künftige Beschaffungen vor, dass Supporttools offene Exportformate und Standard-APIs (REST/OpenAPI) unterstützen müssen.'},
+      {minScore:1.0,prio:4,title:'Jährliche Marktbeobachtung und Technologie-Check',desc:'Beobachten Sie einmal jährlich den Markt für dieses Tool-Segment und prüfen Sie neue Alternativen und Preisentwicklungen.'}
+    ]
+  },
+  econ: {
+    label:'Wirtschaftlich', color:'#c4614a',
+    actions:[
+      {minScore:3.5,prio:1,title:'Vertragskonditionen aktiv nachverhandeln, Alternativangebote einholen',desc:'Nutzen Sie die nächste Verlängerungsrunde aktiv: kürzere Laufzeiten, transparente Preise, einfachere Kündigung. Konkurrenzangebote stärken die Verhandlungsposition erheblich (W-03).'},
+      {minScore:2.5,prio:2,title:'Kündigungsfristen und Verlängerungsdaten im Governance-Kalender erfassen',desc:'Stellen Sie sicher, dass Kündigungsfristen bekannt sind und automatische Verlängerungen nicht unbemerkt greifen (W-04).'},
+      {minScore:2.0,prio:3,title:'Bündelung und tatsächliche Nutzung überprüfen',desc:'Analysieren Sie, ob alle gebündelten Leistungen tatsächlich genutzt werden und ob eine Einzellösung günstiger käme (W-03).'},
+      {minScore:1.0,prio:4,title:'Jährlicher Preis-Leistungs-Vergleich',desc:'Vergleichen Sie die Konditionen einmal jährlich mit dem Markt (W-01/W-04).'}
+    ]
+  },
+  org: {
+    label:'Organisatorisch', color:'#6b5a8a',
+    actions:[
+      {minScore:3.5,prio:2,title:'Change-Aufwand für Wechselszenario abschätzen und kommunizieren',desc:'Schätzen Sie den Schulungs- und Begleitungsaufwand für die Hauptnutzenden und kommunizieren Sie ihn als realistischen Wechselkostenfaktor (O-03).'},
+      {minScore:2.5,prio:2,title:'Prozessdokumentation für kritische Workflows erstellen',desc:'Halten Sie die wichtigsten Geschäftsprozesse in einer für Nicht-Techniker lesbaren Form fest, sodass ein alternatives Tool konfiguriert werden kann (O-02).'},
+      {minScore:2.0,prio:3,title:'Nutzerzufriedenheit und Wechselbereitschaft erheben',desc:'Befragen Sie Hauptnutzende einmal jährlich zu Zufriedenheit und hypothetischer Wechselbereitschaft (O-04).'},
+      {minScore:1.0,prio:4,title:'Betriebswissen auf mehrere Personen verteilen',desc:'Stellen Sie sicher, dass mindestens zwei Personen das Tool administrieren können (O-01).'}
+    ]
+  },
+  legal: {
+    label:'Rechtlich', color:'#2d8a7a',
+    actions:[
+      {minScore:3.5,prio:1,title:'Datenschutz-Konformität und Datenspeicherort überprüfen',desc:'Klären Sie, ob alle verarbeiteten Personendaten nDSG/DSGVO-konform behandelt werden und der Datenspeicherort vertraglich geregelt ist (R-01/R-03).'},
+      {minScore:2.5,prio:2,title:'Faire Vertragsklauseln bei nächster Verlängerung einfordern',desc:'Bestehen Sie auf Sonderkündigungsrechten bei Preiserhöhung und klaren Datenmitnahmerechten. EU Data Act Art. 23–26 als Verhandlungshebel nutzen (R-08/R-09).'},
+      {minScore:1.5,prio:3,title:'Compliance-Anforderungen für Wechselszenario klären',desc:'Prüfen Sie mit IT-Sicherheit und Compliance, welche Anforderungen bei einem Wechsel zu erfüllen wären (R-07).'},
+      {minScore:1.0,prio:4,title:'Jährliche Compliance-Prüfung',desc:'Verifizieren Sie jährlich, ob die Datenschutz-Konformität des Anbieters weiterhin aktuell und nachgewiesen ist (R-03/R-07).'}
+    ]
+  },
+  strat: {
+    label:'Strategisch', color:'#b8823a',
+    actions:[
+      {minScore:3.0,prio:2,title:'Exitüberlegung dokumentieren und Alternativanbieter vorqualifizieren',desc:'Halten Sie in einem kurzen Dokument fest, wie ein Wechsel in 3–4 Schritten ablaufen würde und welche Alternativen infrage kämen (S-01).'},
+      {minScore:2.0,prio:3,title:'Vertragsverlängerung strategisch mit Vorlauf planen',desc:'Tragen Sie Verlängerungsdaten mit ausreichend Vorlauf in den Governance-Kalender ein und planen Sie eine Marktevaluation vor der Verlängerung (S-04).'},
+      {minScore:1.0,prio:4,title:'Vendor-Abhängigkeit in IT-Governance-Prozess verankern',desc:'Integrieren Sie das Thema Vendor-Lock-in in den jährlichen IT-Governance-Review — auch für Supporttools (S-03).'}
+    ]
+  },
+  res: {
+    label:'Resilienz', color:'#a05070',
+    actions:[
+      {minScore:3.5,prio:2,title:'Notfallprozesse definieren und kommunizieren',desc:'Legen Sie fest, wie der Betrieb bei einem mehrtägigen Ausfall aufrechterhalten wird — manuelle Alternativen, Excel-Fallback o. ä. (RE-01/RE-03).'},
+      {minScore:2.5,prio:3,title:'Manuelle Fallback-Optionen in BCP-Überblick integrieren',desc:'Ergänzen Sie den unternehmensweiten BCP-Überblick um eine kurze Risikoeinschätzung und Notfalloption für diese Applikation (RE-03).'},
+      {minScore:1.0,prio:4,title:'Jährliche Überprüfung der Notfalloptionen',desc:'Stellen Sie sicher, dass die definierten Notfallprozesse bekannt und aktuell sind (RE-01).'}
+    ]
+  }
+};
+
 
 let appType = null;
 let answers = {};
@@ -1643,6 +1750,7 @@ function updateResult() {
   const total = totalScore();
   const risk = getRisk(total);
   const appName = document.getElementById('appname').value.trim() || 'Applikation';
+  const lockInIdx = Math.round((total - 1) / 4 * 100);
   const answered = Object.keys(answers).length;
   const totalQ = DIMS_DEF.reduce((a, d) => a + getQs(d).length, 0);
 
@@ -1674,6 +1782,7 @@ function updateResult() {
         <div class="result-score-block">
           <div class="result-app-name">${appName} · ${appType === 'kern' ? 'Kernapplikation' : 'Supportapplikation'}</div>
           <div class="result-score" style="color:${risk.col}">${total.toFixed(2)}</div>
+          <div style="font-size:13px;color:${risk.col};opacity:.8;margin-top:2px">Lock-in Index: ${lockInIdx} / 100</div>
           <span class="result-risk-pill" style="color:${risk.col};background:${risk.bg};border-color:${risk.border}">Risiko: ${risk.label}</span>
         </div>
         <div class="result-meta">
@@ -2081,7 +2190,10 @@ function openAppModal(appId) {
   document.getElementById('modal-app-name').textContent = app.name;
   document.getElementById('modal-app-meta').textContent =
     (app.type === 'kern' ? 'Kernapplikation' : 'Supportapplikation') + ' · Bewertet am ' + app.date;
+  const lockInIndex = Math.round((app.total - 1) / 4 * 100);
   document.getElementById('modal-score-num').textContent = app.total.toFixed(2);
+  const idxEl = document.getElementById('modal-lockin-index');
+  if (idxEl) idxEl.textContent = 'Lock-in Index: ' + lockInIndex + ' / 100';
   document.getElementById('modal-score-num').style.color = risk.col;
 
   const pill = document.getElementById('modal-risk-pill');
@@ -2186,7 +2298,7 @@ const ACTION_CATALOG_SUPPORT = {
 };
 
 function renderHandlungsoptionen(app) {
-  const dimIds = ['tech','data','contract','ops','exit','biz'];
+  const dimIds = ['tech','econ','org','legal','strat','res'];
   const catalog = app.type === 'support' ? ACTION_CATALOG_SUPPORT : ACTION_CATALOG;
   const scores = app.scores || [];
 
@@ -2268,6 +2380,7 @@ function renderHandlungsoptionen(app) {
       <div>
         <span class="modal-risk-pill" id="modal-risk-pill"></span>
         <div style="font-size:12px;color:var(--text3);margin-top:4px" id="modal-answered"></div>
+        <div style="font-size:12px;color:var(--text2);margin-top:3px;font-weight:500" id="modal-lockin-index"></div>
       </div>
     </div>
     <div class="modal-tabs">
