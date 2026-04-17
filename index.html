@@ -1793,6 +1793,10 @@ async function doAdminLogin() {
   document.getElementById('nav-firm-name').textContent = 'Administrator';
   const adminTab = document.getElementById('admin-nav-tab');
   if (adminTab) adminTab.style.display = 'inline-flex';
+  // Hide non-admin tabs
+  const tabs = document.querySelectorAll('.nav-tab');
+  if (tabs[0]) tabs[0].style.display = 'none'; // Bewertung
+  if (tabs[1]) tabs[1].style.display = 'none'; // Portfolio
   showPage('admin');
   renderAdminView();
 }
@@ -1870,11 +1874,52 @@ async function renderAdminView() {
         const favg = fa.length ? fa.reduce((s,a)=>s+a.total,0)/fa.length : 1;
         const fr = getRisk(favg);
         const fidx = Math.round((favg-1)/4*100);
-        return `<div class="firm-row">
-          <div><div class="firm-row-name">${f.firm}</div><div class="firm-row-meta">${fa.length} Applikation${fa.length!==1?'en':''}</div></div>
-          <div style="text-align:right">
-            <div style="font-family:'DM Serif Display',serif;font-size:20px;color:${fr.col}">${favg.toFixed(2)}</div>
-            <div style="font-size:11px;color:${fr.col};background:${fr.bg};border:1px solid ${fr.border};border-radius:99px;padding:1px 7px;display:inline-block;margin-top:2px">${fr.label}</div>
+        const safeId = btoa(unescape(encodeURIComponent(f.firm))).replace(/[^a-zA-Z0-9]/g,'');
+        const appTiles = fa.length ? fa.map(app => {
+          const ar = getRisk(app.total);
+          const aidx = Math.round((app.total-1)/4*100);
+          const dimBars = DIMS_DEF.map((d,di) => {
+            const s = app.scores[di];
+            if (!s) return '';
+            const w = ((s-1)/4*100).toFixed(1);
+            return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+              <div style="font-size:10px;color:var(--text3);width:72px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.short}</div>
+              <div style="flex:1;height:4px;background:var(--surface2);border-radius:99px;overflow:hidden">
+                <div style="width:${w}%;height:100%;background:${d.color};border-radius:99px"></div>
+              </div>
+              <div style="font-size:10px;color:var(--text2);width:22px;text-align:right">${Math.round((s-1)/4*100)}</div>
+            </div>`;
+          }).join('');
+          return `<div style="background:var(--surface2);border-radius:var(--border-radius-md);padding:12px 14px;margin-bottom:8px">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+              <div>
+                <div style="font-size:13px;font-weight:500">${app.name}</div>
+                <div style="font-size:11px;color:var(--text3)">${app.type==='kern'?'Kernapplikation':'Supportapplikation'} · ${app.date||''}</div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-family:'DM Serif Display',serif;font-size:22px;color:${ar.col}">${app.total.toFixed(2)}</div>
+                <div style="font-size:11px;color:${ar.col};background:${ar.bg};border:1px solid ${ar.border};border-radius:99px;padding:1px 7px;display:inline-block">${ar.label}</div>
+              </div>
+            </div>
+            ${dimBars}
+          </div>`;
+        }).join('') : `<div style="font-size:13px;color:var(--text3);padding:12px 0">Keine Applikationen bewertet.</div>`;
+        return `<div>
+          <div class="firm-row" onclick="toggleFirmDetail('${safeId}')">
+            <div>
+              <div class="firm-row-name">${f.firm}</div>
+              <div class="firm-row-meta">${fa.length} Applikation${fa.length!==1?'en':''} · klicken für Details</div>
+            </div>
+            <div style="text-align:right;display:flex;align-items:center;gap:12px">
+              <div>
+                <div style="font-family:'DM Serif Display',serif;font-size:20px;color:${fr.col}">${favg.toFixed(2)}</div>
+                <div style="font-size:11px;color:${fr.col};background:${fr.bg};border:1px solid ${fr.border};border-radius:99px;padding:1px 7px;display:inline-block;margin-top:2px">${fr.label}</div>
+              </div>
+              <svg id="chev-${safeId}" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" style="transition:transform .2s;flex-shrink:0"><path d="M3 5l4 4 4-4"/></svg>
+            </div>
+          </div>
+          <div id="detail-${safeId}" style="display:none;padding:12px 16px 4px;background:var(--surface);border:1px solid var(--border);border-top:none;border-radius:0 0 var(--border-radius-md) var(--border-radius-md);margin-bottom:6px">
+            ${appTiles}
           </div>
         </div>`;
       }).join('');
@@ -1894,6 +1939,15 @@ async function renderAdminView() {
   } catch(e) {
     c.innerHTML = `<div style="padding:40px;text-align:center;color:var(--text3)">Fehler: ${e.message}</div>`;
   }
+}
+
+function toggleFirmDetail(id) {
+  const detail = document.getElementById('detail-' + id);
+  const chev = document.getElementById('chev-' + id);
+  if (!detail) return;
+  const open = detail.style.display === 'block';
+  detail.style.display = open ? 'none' : 'block';
+  if (chev) chev.style.transform = open ? '' : 'rotate(180deg)';
 }
 
 async function renderFirmChips() { /* firm list hidden for privacy */ }
@@ -2264,6 +2318,8 @@ function updateNavCount() {
 }
 
 function showPage(id, evt) {
+  // Admin cannot access portfolio or assess pages
+  if (currentFirm === '__admin__' && (id === 'portfolio' || id === 'assess')) return;
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   const pg = document.getElementById('page-' + id);
